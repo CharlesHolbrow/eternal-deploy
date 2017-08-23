@@ -12,6 +12,7 @@ func main() {
 	NewNote(synkConn)
 }
 
+// NewNote creates and 'synks' a new Note object
 func NewNote(synkConn *synk.RedisConnection) {
 	n := eternal.Note{}
 
