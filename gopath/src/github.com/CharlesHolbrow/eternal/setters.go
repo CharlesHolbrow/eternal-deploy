@@ -1,0 +1,105 @@
+package eternal
+
+import "github.com/CharlesHolbrow/synk"
+
+// noteDiff diff type for a character
+type noteDiff struct {
+  SubKey *string `json:"subKey,omitempty"`
+  Number *int `json:"number,omitempty"`
+}
+
+// State returns a fully populated diff of the unresolved state
+func (o *Note) State() interface{} {
+	d := noteDiff{
+    SubKey: &o.SubKey,
+    Number: &o.Number,
+  }
+  return d
+}
+
+// Resolve applies the current diff, then returns it
+func (o *Note) Resolve() interface{} {
+  if o.diff.SubKey != nil {o.SubKey = *o.diff.SubKey}
+  if o.diff.Number != nil {o.Number = *o.diff.Number}
+  diff := o.diff
+  o.diff = noteDiff{}
+  return diff
+}
+
+// Changed checks if struct has been changed since the last .Resolve()
+func (o *Note) Changed() bool {
+  return o.diff.SubKey != nil ||
+		o.diff.Number != nil
+}
+
+// TypeKey getter for main and diff structs
+func (o *Note) TypeKey() string { return "n" }
+// Key getter for main object
+func (o *Note) Key() string { return "n:"+o.ID }
+// TypeKey getter for main and diff structs
+func (o noteDiff) TypeKey() string { return "n" }
+// Diff getter
+func (o *Note) Diff() interface{} { return o.diff }
+// Copy duplicates this object and returns an interface to it.
+// The object's diff will be copied too, with the exception of the diffMap for
+// array members. A diffMap is created automatically when we use array Element
+// setters (ex SetDataElement). Copy() will create shallow copies of unresolved
+// diffMaps. Usually we Resolve() after Copy() which means that our shallow copy
+// will be safe to send over a channel.
+func (o *Note) Copy() synk.Object {
+	n := *o
+	return &n
+}
+// Init (ialize) all diff fields to the current values. The next call to
+// Resolve() will return a diff with all the fields initialized.
+func (o *Note) Init() {
+	o.diff = o.State().(noteDiff)
+}
+// SetSubKey on diff
+func (o *Note) SetSubKey(v string) {
+  if v != o.SubKey {
+    o.diff.SubKey = &v
+  } else {
+    o.diff.SubKey = nil
+  }
+}
+// GetPrevSubKey Gets the previous value. Ignores diff.
+func (o *Note) GetPrevSubKey() string { return o.SubKey }
+// GetSubKey from diff. Fall back to current value if no diff
+func (o *Note) GetSubKey() string {
+	if o.diff.SubKey != nil {
+		return *o.diff.SubKey
+	}
+	return o.SubKey
+}
+// GetSubKey. Diff method
+func (o noteDiff) GetSubKey() *string { return o.SubKey }
+// SetNumber on diff
+func (o *Note) SetNumber(v int) {
+  if v != o.Number {
+    o.diff.Number = &v
+  } else {
+    o.diff.Number = nil
+  }
+}
+// GetPrevNumber Gets the previous value. Ignores diff.
+func (o *Note) GetPrevNumber() int { return o.Number }
+// GetNumber from diff. Fall back to current value if no diff
+func (o *Note) GetNumber() int {
+	if o.diff.Number != nil {
+		return *o.diff.Number
+	}
+	return o.Number
+}
+// GetNumber. Diff method
+func (o noteDiff) GetNumber() *int { return o.Number }
+// GetID returns the ID
+func (o *Note) GetID() string { return o.ID }
+// SetID -- but only if it has not been set. This helps us avoid accidentally
+// setting it twice. Return the item's ID either way.
+func (o *Note) SetID(id string) string {
+	if o.ID == "" {
+		o.ID = id
+	}
+	return o.ID
+}

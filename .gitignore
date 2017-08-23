@@ -1,0 +1,11 @@
+**.DS_Store
+gopath/bin
+gopath/pkg
+gopath/src/*
+!gopath/src/github.com
+gopath/src/github.com/*
+!gopath/src/github.com/CharlesHolbrow
+gopath/src/github.com/CharlesHolbrow/*
+!gopath/src/github.com/CharlesHolbrow/eternal
+!gopath/src/github.com/CharlesHolbrow/eternal-http
+!gopath/src/github.com/CharlesHolbrow/eternal-action
