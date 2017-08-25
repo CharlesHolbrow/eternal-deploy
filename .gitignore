@@ -1,6 +1,6 @@
 **.DS_Store
-gopath/bin
-gopath/pkg
+gopath/*
+!gopath/src
 gopath/src/*
 !gopath/src/github.com
 gopath/src/github.com/*

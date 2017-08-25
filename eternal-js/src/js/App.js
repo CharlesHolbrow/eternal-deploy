@@ -1,4 +1,4 @@
-import { Objects, Connection }  from 'synk-js';
+import { Objects, Connection, Synk }  from 'synk-js';
 import AppEndpoint from './AppEndpoint.js';
 import Note from './Note.js';
 
@@ -13,26 +13,23 @@ export default class App {
     const https = window.location.protocol.startsWith('https');
     const url =  `${https ? 'wss' : 'ws'}://${window.location.host}/ws`;
 
-    this.conn = new Connection(url);
+    this.synk = new Synk(url);
     this.endpoint = new AppEndpoint(this);
-    this.objects = new Objects(); // app has a convenience ref to 'objects'
 
     // All messages from the server will be passed to the endpoint. Thanks to
     // the connection object, even if we disconnect and reconnect, incoming
     // messages will still be passed through to this.endpoint.
-    this.endpoint.subscribe(this.conn.stream);
+    this.endpoint.subscribe(this.synk.connection.stream);
 
     // Set the default class for Characters
-    this.objects.byKey.createBranch('n').class = Note;
+    this.synk.objects.byKey.createBranch('n').class = Note;
 
-    // Objects receive sync messages from the server.
-    this.objects.subscribe(this.conn.stream);
-
-    // When the connection closes, remove all chunks.
-    //
     // We could replace 'close' with reconnect'
-    this.conn.on('close', () => {
-      console.log('connection close');
+    this.synk.connection.on('close', () => {
+      console.log('connection close bySKey.branches:', Object.keys(this.synk.objects.bySKey.branches));
+    });
+    this.synk.connection.on('open', () => {
+      console.log('connection open bySKey.branches: ', Object.keys(this.synk.objects.bySKey.branches));
     });
   }
 }

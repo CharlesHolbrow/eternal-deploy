@@ -14,14 +14,9 @@ window.App = App;
 
 window.onload = () => {
   const app = window.app = new App();
-  const msg = {
-    method: 'updateSubscription',
-    add: ['eternal:main'],
-    remove: [],
-  };
 
-  app.objects.updateKeys(msg);
-  app.conn.send(msg);
+  app.synk.setSubscription(['eternal:main']);
+  app.synk.resolve();
 };
 
 window.oncontextmenu = (event) => {
