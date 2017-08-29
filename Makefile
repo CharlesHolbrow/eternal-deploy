@@ -25,6 +25,9 @@ golibs:
 	go get github.com/garyburd/redigo/redis
 	go get github.com/gorilla/websocket
 
+eternal-http: $(GOPATH)/bin/eternal-http
+	GOPATH=$(GOPATH); go install github.com/CharlesHolbrow/eternal-http
+
 prod-client:
 	cd eternal-js && npm run build:prod && cd .. && rm -f public && ln -s eternal-js/production public
 
