@@ -11,19 +11,19 @@ import (
 )
 
 // By default, look for redis locally at ":6379". We may specify another host by
-// setting the "AETHER_REDIS_HOST" environment variable.
-var redisAddr = os.Getenv("ETERNAL_REDIS_HOST") + ":6379"
+// setting the "SYNK_REDIS_HOST" environment variable.
+var redisAddr = os.Getenv("SYNK_REDIS_HOST") + ":6379"
 
 // AETHER_ENV should be "production" or an empty string. We may add additional
 // environments in the future. For now, if this is an empty string, or if it is
 // not set, assume development.
-var env = os.Getenv("ETERNAL_ENV")
+var env = os.Getenv("SYNK_ENV")
 
 // Setting the AETHER_CERT_PATH environment variable to a non-empty string
 // indicates that the following files should be found at the specified path:
 // - fullchain.pem
 // - privkey.pem
-var eternalCertPath = os.Getenv("ETERNAL_CERT_PATH")
+var eternalCertPath = os.Getenv("SYNK_CERT_PATH")
 var certChainFilename = eternalCertPath + "/fullchain.pem"
 var privKeyFilename = eternalCertPath + "/privkey.pem"
 
@@ -68,11 +68,15 @@ func (cc EternalClient) OnMessage(client *synk.Client, method string, data []byt
 	log.Println("Custom Client Message:", method)
 }
 
+func (cc EternalClient) OnSubscribe(client *synk.Client, subKeys []string, objs []synk.Object) {
+	log.Printf("Custom Client: Subscription add(%d) objs(%d)", len(subKeys), len(objs))
+}
+
 func main() {
 
 	// In production we must specify the location of TLS certificates
 	if env == "production" && eternalCertPath == "" {
-		log.Panicln("The ETERNAL_CERT_PATH environment variable must be set in production")
+		log.Panicln("The SYNK_CERT_PATH environment variable must be set in production")
 	}
 
 	synkConn := synk.NewConnection(redisAddr)

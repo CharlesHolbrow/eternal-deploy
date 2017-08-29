@@ -1,0 +1,31 @@
+version: '3'
+services:
+  eternal-http:
+    build: .
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    environment:
+      - SYNK_REDIS_HOST=redis
+      - SYNK_ENV=production
+      - SYNK_CERT_PATH=/certbotconfig/live/eternal.media.mit.edu/
+    volumes:
+      - ./certificates/config:/certbotconfig/
+  redis:
+    image: redis
+    # Setting the container name explicitly prevents docker-compose from
+    # scaleing this image beyond a single instance. In the case of redis, this
+    # is desirable - we only want one redis instance. We also use the container
+    # name (with DNS) to help eternal-http instances find the redis service.
+    container_name: redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+
+# Because we use a named volume, the `$ docker-compse down` command will not
+# remove the volume. If we specify an anonymous volume in the redis service,
+# running `docker-compose down` will remove the volume.
+#
+# To remove the redis-data volume, use the -v option `$ docker-compose down -v`
+volumes:
+  redis-data:
