@@ -7,22 +7,30 @@ export default class Note {
    * @param {object} state - initial state provided by synk server
    */
   constructor(key, state) {
+    this.elementPre = document.createElement('pre');
+    this.elementCode = document.createElement('code');
+    this.elementPre.appendChild(this.elementCode);
+
+    this.state = { key, type: 'Note' };
+
     // Set any additional properties provided by the 'state' argument
     if (state !== undefined) this.update(state);
+    document.body.appendChild(this.elementPre);
   }
 
   /**
    * @param {object} state - diff passed by the synk server
    */
   update(state) {
-    Object.assign(this, state);
-    console.log('diff:', state, 'object:', this);
+    Object.assign(this.state, state);
+    this.elementCode.innerText = JSON.stringify(this.state, null, '  ');
   }
 
   /**
-   * Called when this object leaves our subscription area, or is removed from the synk server
+   * Called when this object leaves our subscription area, or is removed from
+   * the synk server.
    */
   teardown() {
-    console.log('teardown:', this);
+    document.body.removeChild(this.elementPre);
   }
 }
