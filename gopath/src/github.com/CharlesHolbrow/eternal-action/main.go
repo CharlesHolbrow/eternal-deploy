@@ -12,7 +12,6 @@ import (
 func main() {
 	synkConn := synk.NewConnection(":6379")
 	rConn := synkConn.Pool.Get()
-
 	objs, err := synk.RequestObjects(rConn, []string{"eternal:main"}, eternal.BuildObject)
 
 	if err != nil {
@@ -23,6 +22,8 @@ func main() {
 		obj := objs[i%len(objs)]
 		if n, ok := obj.(*eternal.Note); ok {
 			fmt.Printf("Num: %d\tVel: %d\n", n.GetNumber(), n.GetVelocity())
+			n.SetNumber((n.GetNumber() + 1) % 127)
+			synk.HandleMessage(synk.ModObj{Object: n}, rConn)
 		}
 		time.Sleep(time.Second)
 	}
