@@ -11,6 +11,8 @@ import (
 
 func main() {
 	synkConn := synk.NewConnection(":6379")
+	// NewNote(synkConn)
+
 	rConn := synkConn.Pool.Get()
 	objs, err := synk.RequestObjects(rConn, []string{"eternal:main"}, eternal.BuildObject)
 
@@ -27,24 +29,19 @@ func main() {
 		}
 		time.Sleep(time.Second)
 	}
-
-	// NewNote(synkConn)
 }
 
 // NewNote creates and 'synks' a new Note object
 func NewNote(synkConn *synk.RedisConnection) {
-	n := eternal.Note{}
+	n := &eternal.Note{SubKey: "eternal:main"}
 
-	id, err := synkConn.GetID(n.TypeKey())
+	err := synkConn.NewObjectID(n)
 	if err != nil {
 		fmt.Println("Error getting ID:", err)
 		return
 	}
 
-	n.SetID(id)
-	n.SetSubKey("eternal:main")
-
-	msg := synk.NewObj{Object: &n}
+	msg := synk.NewObj{Object: n}
 
 	rConn := synkConn.Pool.Get()
 	synk.HandleMessage(msg, rConn)
