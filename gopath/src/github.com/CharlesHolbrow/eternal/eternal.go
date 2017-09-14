@@ -12,10 +12,11 @@ import (
 // generate the required methods.
 //@PA:n
 type Note struct {
-	ID     string
-	SubKey string
-	Number int
-	diff   noteDiff
+	ID       string
+	SubKey   string
+	Number   int
+	Velocity int
+	diff     noteDiff
 }
 
 // BuildObject creates synk Objects for the eternal app
