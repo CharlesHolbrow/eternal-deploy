@@ -30,7 +30,6 @@ func BuildObject(typeKey string, data []byte) (synk.Object, error) {
 		err = json.Unmarshal(data, note)
 		return note, err
 	}
-
 	txt := fmt.Sprintf("eternal.BuildObject: unsupported typeKey '%s'", typeKey)
 	return result, errors.New(txt)
 }
