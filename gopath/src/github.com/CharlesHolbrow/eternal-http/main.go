@@ -22,11 +22,10 @@ func main() {
 
 	synkConn := synk.NewConnection(redisAddr)
 
-	CustomClientConstructor := func(client *synk.Client) synk.CustomClient {
-		return eternal.Client{}
-	}
-
-	wsHandler := synk.NewHandler(synkConn, eternal.BuildObject, CustomClientConstructor)
+	wsHandler := synk.NewHandler(synkConn, eternal.BuildObject,
+		func(client *synk.Client) synk.CustomClient {
+			return eternal.Client{}
+		})
 
 	// In production we will serve the public directory with nginx. However,
 	// this will still be useful in development.

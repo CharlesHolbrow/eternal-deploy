@@ -12,10 +12,10 @@ import (
 // generate the required methods.
 //@PA:n
 type Note struct {
-	ID       string
-	SubKey   string
-	Number   int
-	Velocity int
+	ID       string `json:"id"`
+	SubKey   string `json:"subKey"`
+	Number   int    `json:"number"`
+	Velocity int    `json:"velocity"`
 	diff     noteDiff
 }
 
