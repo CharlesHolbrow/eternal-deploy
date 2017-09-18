@@ -6,16 +6,17 @@ export default class Note {
    * @param {string} key - provided by synk server
    * @param {object} state - initial state provided by synk server
    */
-  constructor(key, state) {
+  constructor(key, state, synkObjects) {
     this.elementPre = document.createElement('pre');
     this.elementCode = document.createElement('code');
     this.elementPre.appendChild(this.elementCode);
+    this.parent = document.getElementById('root');
 
     this.state = { key, type: 'Note' };
 
     // Set any additional properties provided by the 'state' argument
     if (state !== undefined) this.update(state);
-    document.body.appendChild(this.elementPre);
+    this.parent.appendChild(this.elementPre);
   }
 
   /**
@@ -31,6 +32,6 @@ export default class Note {
    * the synk server.
    */
   teardown() {
-    document.body.removeChild(this.elementPre);
+    this.parent.removeChild(this.elementPre);
   }
 }

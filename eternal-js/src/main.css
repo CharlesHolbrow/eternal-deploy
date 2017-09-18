@@ -3,7 +3,11 @@ html, div {padding: 0; margin: 0}
 html {
   /* Prevent us from being able to scroll past the end of
   the page */
-  overflow: hidden;
+  /* overflow: hidden; */
+}
+
+#root {
+  color: #1100FF;
 }
 
 div.pane {

@@ -19,9 +19,11 @@ window.onload = () => {
   app.synk.resolve();
 };
 
-window.oncontextmenu = (event) => {
-  event.preventDefault();
-  event.stopPropagation();
+const preventContextMenu = () => {
+  window.oncontextmenu = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-  return false;
+    return false;
+  };
 };
