@@ -15,16 +15,16 @@ func main() {
 	fmt.Printf("Got %d objects\n", len(part.Notes))
 
 	// Create a new note
-	part.AddNote(&eternal.Note{})
-	part.AddNote(&eternal.Note{})
-	part.AddNote(&eternal.Note{})
+	// part.AddNote(&eternal.Note{})
+	// part.AddNote(&eternal.Note{})
+	// part.AddNote(&eternal.Note{})
 
 	// remove a random object
-	// for _, note := range part.Notes {
-	// 	synkConn.Delete(note)
-	// 	delete(part.Notes, note.Key())
-	// 	break
-	// }
+	for _, note := range part.Notes {
+		synkConn.Delete(note)
+		delete(part.Notes, note.Key())
+		break
+	}
 
 	for {
 		for _, n := range part.Notes {

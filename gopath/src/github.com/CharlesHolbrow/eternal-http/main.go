@@ -13,33 +13,17 @@ import (
 // setting the "SYNK_REDIS_HOST" environment variable.
 var redisAddr = os.Getenv("SYNK_REDIS_HOST") + ":6379"
 
-// AETHER_ENV should be "production" or an empty string. We may add additional
+// SYNK_ENV should be "production" or an empty string. We may add additional
 // environments in the future. For now, if this is an empty string, or if it is
 // not set, assume development.
 var env = os.Getenv("SYNK_ENV")
-
-//
-type EternalClient struct {
-}
-
-func (cc EternalClient) OnConnect(client *synk.Client) {
-	log.Println("Custom Client Connected:", client.ID)
-}
-
-func (cc EternalClient) OnMessage(client *synk.Client, method string, data []byte) {
-	log.Println("Custom Client Message:", method)
-}
-
-func (cc EternalClient) OnSubscribe(client *synk.Client, subKeys []string, objs []synk.Object) {
-	log.Printf("Custom Client: Subscription add(%d) objs(%d)", len(subKeys), len(objs))
-}
 
 func main() {
 
 	synkConn := synk.NewConnection(redisAddr)
 
 	CustomClientConstructor := func(client *synk.Client) synk.CustomClient {
-		return EternalClient{}
+		return eternal.Client{}
 	}
 
 	wsHandler := synk.NewHandler(synkConn, eternal.BuildObject, CustomClientConstructor)

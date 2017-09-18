@@ -41,7 +41,7 @@ func (frag *Fragment) LoadObject(typeKey string, bytes []byte) {
 	case *Note:
 		frag.Notes[obj.Key()] = obj
 	default:
-		log.Printf("LoadObject got unhandled type: %T", obj)
+		log.Printf("LoadObject got unsupported type: %T", obj)
 	}
 }
 
