@@ -16,8 +16,7 @@ func main() {
 
 	// Create a new note
 	// part.AddNote(&eternal.Note{})
-	// part.AddNote(&eternal.Note{})
-	// part.AddNote(&eternal.Note{})
+	part.AddNote(&eternal.Note{})
 
 	// remove a random object
 	for _, note := range part.Notes {
@@ -29,7 +28,7 @@ func main() {
 	for {
 		for _, n := range part.Notes {
 			fmt.Printf("Num: %d\tVel: %d\n", n.GetNumber(), n.GetVelocity())
-			n.SetNumber((n.GetNumber() + 1) % 127)
+			n.SetNumber((n.GetNumber() + 1) % 128)
 			synkConn.Modify(n)
 			time.Sleep(time.Second)
 		}
