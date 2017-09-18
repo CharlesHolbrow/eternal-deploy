@@ -10,3 +10,4 @@ gopath/src/github.com/CharlesHolbrow/*
 !gopath/src/github.com/CharlesHolbrow/eternal-http
 !gopath/src/github.com/CharlesHolbrow/eternal-action
 eternal-http-linux
+.vscode/
