@@ -16,7 +16,8 @@
     "@tweenjs/tween.js": "^16.8.0",
     "eventemitter3": "^2.0.3",
     "kefir": "^3.7.2",
-    "synk-js": "git+ssh://git@github.com/CharlesHolbrow/synk-js.git"
+    "synk-js": "git+ssh://git@github.com/CharlesHolbrow/synk-js.git",
+    "vexflow": "^1.2.84"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",

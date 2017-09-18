@@ -7,11 +7,11 @@ export default class Note {
    * @param {object} state - initial state provided by synk server
    */
   constructor(key, state, synkObjects) {
+    this.synkObjects = synkObjects;
     this.elementPre = document.createElement('pre');
     this.elementCode = document.createElement('code');
     this.elementPre.appendChild(this.elementCode);
     this.parent = document.getElementById('root');
-
     this.state = { key, type: 'Note' };
 
     // Set any additional properties provided by the 'state' argument
@@ -25,6 +25,10 @@ export default class Note {
   update(state) {
     Object.assign(this.state, state);
     this.elementCode.innerText = JSON.stringify(this.state, null, '  ');
+
+    // Draw the musical notation
+    if (typeof state.number === 'number')
+      this.synkObjects.transcriber.setNote(state.number);
   }
 
   /**
