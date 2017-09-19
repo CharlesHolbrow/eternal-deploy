@@ -6,13 +6,13 @@ PWD := $(shell pwd)
 GOPATH := $(PWD)/gopath
 GOCODE := $(GOPATH)/src/github.com/CharlesHolbrow
 PUBLIC_DIR := ./public
-ETERNAL_SOURCES := $(shell find $(GOCODE)/eternal $(GOCODE)/eternal-http $(GOCODE)/synk -name \*.go)
+ETERNAL_SOURCES := $(shell find $(GOCODE)/eternal $(GOCODE)/eternal-http $(GOCODE)/synk $(GOCODE)/eternal-action -name \*.go)
 
 # The default target builds all the images that will be used by `docker-compose up`
 # This is designed to run in production.
 #
 # This does not generate a tls certificate.
-images: Dockerfile_main Dockerfile_synk golibs docker-compose.yml eternal-http-linux
+images: Dockerfile_main Dockerfile_synk Dockerfile_action golibs docker-compose.yml eternal-http-linux eternal-action-linux
 	docker-compose build
 
 # The prod-client and dev-client targets fully remove the public dir, and re-
@@ -78,6 +78,9 @@ eternal-http: $(GOPATH)/bin/eternal-http
 
 eternal-http-linux: $(ETERNAL_SOURCES)
 	env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o $@ github.com/CharlesHolbrow/eternal-http
+
+eternal-action-linux: $(ETERNAL_SOURCES)
+	env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o $@ github.com/CharlesHolbrow/eternal-action
 
 certificates:
 	mkdir -p certificates

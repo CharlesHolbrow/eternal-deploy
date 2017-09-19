@@ -11,3 +11,4 @@ gopath/src/github.com/CharlesHolbrow/*
 !gopath/src/github.com/CharlesHolbrow/eternal-action
 eternal-http-linux
 .vscode/
+eternal-action-linux
