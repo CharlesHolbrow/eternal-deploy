@@ -1,6 +1,28 @@
 import { Flow as VF } from 'vexflow';
 
-const vfNotes = ['c/4', 'd/4', 'e/4', 'f/4', 'g/4', 'a/4', 'b/4', 'c/5'];
+const noteNames = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
+const octaveNumber = ['-1', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+const whiteNotes = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
+const vfNotes = window.vfNotes = new Array(128);
+
+const durations = {
+  1: 'q',
+  2: 'h',
+  4: 'w',
+};
+
+for (let i = 0; i < 128; i++){
+  const name = noteNames[i % 12];
+  const octave = octaveNumber[Math.floor(i / 12)];
+
+  vfNotes[i] = `${name}/${octave}`;
+}
+
+// middle c = c4 = 60
+// c3 = 48
+// c2 = 36
+// c1 = 24
+// c0 = 12
 
 /**
  * Represent a dynamically updating staff
@@ -15,29 +37,29 @@ export default class Transcriber {
     this.renderer = new VF.Renderer(element, VF.Renderer.Backends.SVG);
     this.renderer.resize(500, 180);
     this.stave.addClef('treble').addTimeSignature('4/4');
-    this.stave.setContext(this.renderer.getContext())
-    
-    // this.setNote(0);
+    this.stave.setContext(this.renderer.getContext());
   }
 
-  setNote(noteNum) {
+  setNote(noteNums, beatsArray) {
     this.renderer.getContext().clear();
     this.stave.draw();
 
-    // Voice represents a sequence of notes
-    this.voice = new VF.Voice({ num_beats: 1, beat_value: 4 });
+    let totalBeats = 0;
+    const notes = [];
 
-    const key = vfNotes[noteNum % 8];
+    for (let i = 0; i < beatsArray.length; i++) {
+      const beats = beatsArray[i];
+      const noteNum = noteNums[i];
 
-    if (typeof key !== 'string') {
-      console.warn('Got bad noteNum/key', noteNum, key);
-
-      return;
+      if (beats <= 0) break;
+      totalBeats += beats;
+      notes.push(
+        new VF.StaveNote({ clef: 'treble', keys: [`${whiteNotes[noteNum % 7]}/4`], duration: durations[beats] }),
+      );
     }
 
-    const notes = [
-      new VF.StaveNote({ clef: 'treble', keys: [key], duration: 'q' }),
-    ];
+    // Voice represents a sequence of notes
+    this.voice = new VF.Voice({ num_beats: totalBeats, beat_value: 4 });
 
     this.voice.addTickables(notes);
 

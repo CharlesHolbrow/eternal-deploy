@@ -1,7 +1,7 @@
 /**
  * Example object
  */
-export default class Note {
+export default class Voice {
   /**
    * @param {string} key - provided by synk server
    * @param {object} state - initial state provided by synk server
@@ -13,7 +13,12 @@ export default class Note {
     this.elementCode = document.createElement('code');
     this.elementPre.appendChild(this.elementCode);
     this.parent = document.getElementById('root');
-    this.state = { key, type: 'Note' };
+    this.state = { key, type: 'Voice' };
+
+    if (state && state.notes)
+      this.state.notes = state.notes;
+    if (state && state.lengths)
+      this.state.lengths = state.lengths;
 
     // Set any additional properties provided by the 'state' argument
     if (state !== undefined) this.update(state);
@@ -24,7 +29,18 @@ export default class Note {
    * @param {object} state - diff passed by the synk server
    */
   update(state) {
+    if (state.notes) {
+      console.log('notes:', state.notes);
+      delete state.notes;
+    }
+
+    if (state.lengths) {
+      console.log('lengths:', state.lengths);
+      delete state.lengths;
+    }
+
     Object.assign(this.state, state);
+
     this.elementCode.innerText = JSON.stringify(this.state, null, '  ');
 
     // Draw the musical notation

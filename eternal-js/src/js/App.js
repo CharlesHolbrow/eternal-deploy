@@ -1,6 +1,7 @@
 import { Objects, Connection, Synk }  from 'synk-js';
 import AppEndpoint from './AppEndpoint.js';
 import Note from './Note.js';
+import Voice from './Voice.js';
 
 /**
 * High level Aether Application
@@ -21,8 +22,9 @@ export default class App {
     // messages will still be passed through to this.endpoint.
     this.endpoint.subscribe(this.synk.connection.stream);
 
-    // Set the default class for Characters
-    this.synk.objects.byKey.createBranch('n').class = Note;
+    // Set default classes
+    // this.synk.objects.byKey.createBranch('n').class = Note;
+    this.synk.objects.byKey.createBranch('v').class = Voice;
 
     // We could replace 'close' with reconnect'
     this.synk.connection.on('close', () => {
