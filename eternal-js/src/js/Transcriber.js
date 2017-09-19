@@ -1,5 +1,5 @@
 import { Flow as VF } from 'vexflow';
-import { floatToVexflowDuration } from './util.js'
+import { floatToVexflowDuration } from './util.js';
 
 const noteNames = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
 const octaveNumber = ['-1', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
