@@ -9,6 +9,7 @@ import (
 // Fragment stores the contents of a subscription key
 type Fragment struct {
 	Notes    map[string]*Note
+	Voices   map[string]*Voice
 	sKey     string
 	synkConn *synk.RedisConnection
 }
@@ -17,6 +18,7 @@ type Fragment struct {
 func NewFragment(key string, synkConn *synk.RedisConnection) *Fragment {
 	notes := &Fragment{
 		Notes:    make(map[string]*Note),
+		Voices:   make(map[string]*Voice),
 		synkConn: synkConn,
 		sKey:     key,
 	}
@@ -40,6 +42,8 @@ func (frag *Fragment) LoadObject(typeKey string, bytes []byte) {
 	switch obj := objInterface.(type) {
 	case *Note:
 		frag.Notes[obj.Key()] = obj
+	case *Voice:
+		frag.Voices[obj.Key()] = obj
 	default:
 		log.Printf("LoadObject got unsupported type: %T", obj)
 	}

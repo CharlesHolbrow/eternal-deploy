@@ -12,7 +12,12 @@ func main() {
 	synkConn := synk.NewConnection(":6379")
 
 	part := eternal.NewFragment("eternal:main", synkConn)
-	fmt.Printf("Got %d objects\n", len(part.Notes))
+	fmt.Printf("Got %d Notes and %d Voices\n", len(part.Notes), len(part.Voices))
+	// voice := &eternal.Voice{
+	// 	SubKey: "eternal:main",
+	// }
+	// synkConn.Create(voice)
+	time.Sleep(30 * time.Millisecond)
 
 	// Create a new note
 	// part.AddNote(&eternal.Note{})
@@ -25,12 +30,12 @@ func main() {
 	// 	break
 	// }
 
-	for {
-		for _, n := range part.Notes {
-			fmt.Printf("Num: %d\tVel: %d\n", n.GetNumber(), n.GetVelocity())
-			n.SetNumber((n.GetNumber() + 1) % 8)
-			synkConn.Modify(n)
-			time.Sleep(time.Second)
-		}
-	}
+	// for {
+	// 	for _, n := range part.Notes {
+	// 		fmt.Printf("Num: %d\tVel: %d\n", n.GetNumber())
+	// 		n.SetNumber((n.GetNumber() + 1) % 8)
+	// 		synkConn.Modify(n)
+	// 		time.Sleep(time.Second)
+	// 	}
+	// }
 }

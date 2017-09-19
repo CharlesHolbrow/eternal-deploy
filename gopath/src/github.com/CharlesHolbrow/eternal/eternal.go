@@ -12,11 +12,21 @@ import (
 // generate the required methods.
 //@PA:n
 type Note struct {
-	ID       string `json:"id"`
-	SubKey   string `json:"subKey"`
-	Number   int    `json:"number"`
-	Velocity int    `json:"velocity"`
-	diff     noteDiff
+	ID     string `json:"id"`
+	SubKey string `json:"subKey"`
+	Number int    `json:"number"`
+	Length int    `json:"length"`
+	diff   noteDiff
+}
+
+// Voice represents a sequence of notes
+//@PA:v
+type Voice struct {
+	ID      string  `json:"id"`
+	SubKey  string  `json:"subKey"`
+	Notes   [16]int `json:"notes"`
+	Lengths [16]int `json:"lengths"`
+	diff    voiceDiff
 }
 
 // BuildObject creates synk Objects for the eternal app
@@ -29,6 +39,10 @@ func BuildObject(typeKey string, data []byte) (synk.Object, error) {
 		note := &Note{}
 		err = json.Unmarshal(data, note)
 		return note, err
+	case "v":
+		voice := &Voice{}
+		err = json.Unmarshal(data, voice)
+		return voice, err
 	}
 	txt := fmt.Sprintf("eternal.BuildObject: unsupported typeKey '%s'", typeKey)
 	return result, errors.New(txt)
