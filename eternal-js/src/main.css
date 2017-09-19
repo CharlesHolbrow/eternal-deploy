@@ -9,3 +9,7 @@ html {
 #root {
   color: #08007E;
 }
+
+div#staves div {
+  text-align: center;
+}

@@ -1,3 +1,5 @@
+import Transcriber from './Transcriber.js';
+
 /**
  * Example object
  */
@@ -9,43 +11,46 @@ export default class Voice {
    */
   constructor(key, state, synkObjects) {
     this.synkObjects = synkObjects;
-    this.elementPre = document.createElement('pre');
-    this.elementCode = document.createElement('code');
-    this.elementPre.appendChild(this.elementCode);
-    this.parent = document.getElementById('root');
-    this.state = { key, type: 'Voice' };
+    this.element = document.createElement('div');
+    this.parent = document.getElementById('staves');
+    this.parent.appendChild(this.element);
 
-    if (state && state.notes)
-      this.state.notes = state.notes;
-    if (state && state.lengths)
-      this.state.lengths = state.lengths;
+    this.state = { key, type: 'Voice' };
+    this.transcriber = new Transcriber(this.element);
+    // Initial state will provided on construction will be full arrays
+    // state provided to update calls will be objects
+    this.notes = state.notes;
+    this.lengths = state.lengths;
+    delete state.notes;
+    delete state.lengths;
 
     // Set any additional properties provided by the 'state' argument
-    if (state !== undefined) this.update(state);
-    this.parent.appendChild(this.elementPre);
+    this.update(state);
   }
 
   /**
    * @param {object} state - diff passed by the synk server
    */
   update(state) {
-    if (state.notes) {
-      console.log('notes:', state.notes);
-      delete state.notes;
-    }
+    if (state.notes)
+      this.notes = state.notes;
+    else if (state.notesDiff)
+      Object.assign(this.notes, state.notesDiff);
 
-    if (state.lengths) {
-      console.log('lengths:', state.lengths);
-      delete state.lengths;
-    }
-
-    Object.assign(this.state, state);
-
-    this.elementCode.innerText = JSON.stringify(this.state, null, '  ');
+    if (state.lengths)
+      this.lengths = state.lengths;
+    else if (state.lengthsDiff)
+      Object.assign(this.lengths, state.lengthsDiff);
 
     // Draw the musical notation
-    if (typeof state.number === 'number')
-      this.synkObjects.transcriber.setNote(state.number);
+    this.render();
+  }
+
+  /**
+   * Draw the object to it's element
+   */
+  render() {
+    this.transcriber.setNotes(this.notes, this.lengths);
   }
 
   /**
@@ -53,6 +58,6 @@ export default class Voice {
    * the synk server.
    */
   teardown() {
-    this.parent.removeChild(this.elementPre);
+    this.parent.removeChild(this.element);
   }
 }

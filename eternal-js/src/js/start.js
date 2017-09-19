@@ -17,10 +17,6 @@ window.App = App;
 
 window.onload = () => {
   const app = window.app = new App();
-  const element = document.getElementById('root');
-  const transcriber = new Transcriber(element);
-
-  app.synk.objects.transcriber = transcriber;
 
   app.synk.setSubscription(['eternal:main']);
   app.synk.resolve();
