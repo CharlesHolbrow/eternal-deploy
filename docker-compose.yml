@@ -1,5 +1,15 @@
 version: '3'
 services:
+  action:
+    container_name: action
+    build:
+      context: .
+      dockerfile: Dockerfile_action
+    environment:
+      - SYNK_REDIS_HOST=redis
+      - SYNK_ENV=production
+    depends_on:
+      - redis
   synk:
     container_name: synk
     build:
