@@ -64,11 +64,11 @@ $(GOCODE)/synk:
 $(GOCODE)/pagen:
 	cd $(GOCODE) && git clone git@github.com:CharlesHolbrow/pagen
 
-$(GOPATH)/bin/pagen:
-	cd $<; GOPATH=$(GOPATH); go get && go install
+$(GOPATH)/bin/pagen: $(GOCODE)/pagen
+	cd $@; GOPATH=$(GOPATH); go get && go install
 
 $(GOPATH)/bin/eternal-http: $(GOCODE)/eternal-http $(GOCODE)/eternal $(ETERNAL_SOURCES)
-	cd $<; GOPATH=$(GOPATH); go get && go install
+	cd $@; GOPATH=$(GOPATH); go get && go install
 
 gotools: $(GOCODE)/synk $(GOCODE)/pagen $(GOPATH)/bin/pagen
 
