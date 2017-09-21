@@ -12,3 +12,4 @@ gopath/src/github.com/CharlesHolbrow/*
 eternal-http-linux
 .vscode/
 eternal-action-linux
+certbot/

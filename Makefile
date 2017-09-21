@@ -40,7 +40,7 @@ dev-client:
 #
 # the docker nginx container must be running or this will not work
 prod-certificate: certificates certbot webroot
-	echo; echo "Production Certificate for $(HOST)"; echo \
+	echo; echo "Production Certificate for $(HOST)"; \
 	certbot certonly \
 	--config-dir=certbot/config \
 	--work-dir=certbot/work \
