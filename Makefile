@@ -12,7 +12,13 @@ ETERNAL_SOURCES := $(shell find $(GOCODE)/eternal $(GOCODE)/eternal-http $(GOCOD
 # This is designed to run in production.
 #
 # This does not generate a tls certificate.
-images: Dockerfile_main Dockerfile_synk Dockerfile_action golibs docker-compose.yml eternal-http-linux eternal-action-linux
+#
+# Note that `docker-compose up` will automatically create folders that do not
+# exist if they are required for host volumes. However, these folders will be
+# owned by root. Then when we try to create certificates and copy them into
+# webroot, certbot will not have permission to put the .well_known files there.
+# For that reason, we list 'webroot' as a pre-requisite to the images target.
+images: Dockerfile_main Dockerfile_synk Dockerfile_action golibs docker-compose.yml eternal-http-linux eternal-action-linux webroot
 	docker-compose build
 
 # The prod-client and dev-client targets fully remove the public dir, and re-
@@ -40,7 +46,7 @@ dev-client:
 #
 # the docker nginx container must be running or this will not work
 prod-certificate: certificates certbot webroot
-	echo; echo "Production Certificate for $(HOST)"; echo \
+	echo; echo "Production Certificate for $(HOST)"; \
 	certbot certonly \
 	--config-dir=certbot/config \
 	--work-dir=certbot/work \
@@ -64,7 +70,7 @@ $(GOCODE)/synk:
 $(GOCODE)/pagen:
 	cd $(GOCODE) && git clone git@github.com:CharlesHolbrow/pagen
 
-$(GOPATH)/bin/pagen:
+$(GOPATH)/bin/pagen: $(GOCODE)/pagen
 	cd $<; GOPATH=$(GOPATH); go get && go install
 
 $(GOPATH)/bin/eternal-http: $(GOCODE)/eternal-http $(GOCODE)/eternal $(ETERNAL_SOURCES)
