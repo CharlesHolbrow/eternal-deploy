@@ -104,3 +104,5 @@ webroot:
 debug:
 	@echo $(PWD)
 	@echo $(GOCODE)
+	@echo $(HOST)
+	@echo $(HTTPS_REDIRECT)
