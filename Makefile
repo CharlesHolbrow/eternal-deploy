@@ -28,7 +28,7 @@ prod-client:
 dev-client:
 	cd eternal-js && npm run build:dev && cd .. && rm -rf $(PUBLIC_DIR) && cp -R eternal-js/development $(PUBLIC_DIR)
 
-services: $(shell find /systemd -name \*.service)
+services: $(shell find systemd -name \*.service)
 	sudo cp $? /etc/systemd/system/ # todo: restart services!
 
 # Generate 'fullchain.pem' and 'privkey.pem' symlinks in:
