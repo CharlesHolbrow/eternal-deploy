@@ -23,7 +23,9 @@ images: Dockerfile_main Dockerfile_synk Dockerfile_action golibs docker-compose.
 	docker-compose build
 
 nginx-conf:
-	envsubst '$HTTPS_REDIRECT' < nginx/nginx.template.conf > /etc/nginx/nginx.conf && nginx -s reload
+	env HTTPS_REDIRECT=${HTTPS_REDIRECT}; \
+	envsubst '$$HTTPS_REDIRECT' < nginx/nginx.template.conf > /etc/nginx/nginx.conf && \
+	nginx -s reload
 
 
 # The prod-client and dev-client targets fully remove the public dir, and re-
