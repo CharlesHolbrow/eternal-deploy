@@ -23,7 +23,6 @@ images: Dockerfile_main Dockerfile_synk Dockerfile_action golibs docker-compose.
 	docker-compose build
 
 nginx-conf:
-	env HTTPS_REDIRECT=${HTTPS_REDIRECT}; \
 	envsubst '$$HTTPS_REDIRECT' < nginx/nginx.template.conf > /etc/nginx/nginx.conf && \
 	nginx -s reload
 
@@ -109,3 +108,5 @@ webroot:
 debug:
 	@echo $(PWD)
 	@echo $(GOCODE)
+	@echo $(HOST)
+	@echo $(HTTPS_REDIRECT)
