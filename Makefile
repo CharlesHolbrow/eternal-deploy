@@ -78,7 +78,7 @@ $(GOPATH)/bin/eternal-http: $(GOCODE)/eternal-http $(GOCODE)/eternal $(ETERNAL_S
 
 gotools: $(GOCODE)/synk $(GOCODE)/pagen $(GOPATH)/bin/pagen
 
-golibs: $(GOCODE)/eternal $(GOCODE)/eternal-http $(GOCODE)/synk $(GOPATH)/bin/pagen $(GOPATH)/bin/eternal-http
+golibs: $(GOCODE)/eternal $(GOCODE)/eternal-http $(GOCODE)/synk $(GOPATH)/bin/eternal-http
 
 eternal-http: $(GOPATH)/bin/eternal-http
 
