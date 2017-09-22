@@ -28,8 +28,14 @@ prod-client:
 dev-client:
 	cd eternal-js && npm run build:dev && cd .. && rm -rf $(PUBLIC_DIR) && cp -R eternal-js/development $(PUBLIC_DIR)
 
-services: $(shell find systemd -name \*.service)
-	sudo cp $? /etc/systemd/system/ # todo: restart services!
+# Services!
+services: /etc/systemd/system/synk-ws.service /etc/systemd/system/synk-sim.service
+
+/etc/systemd/system/%.service: systemd/%.service
+	sudo cp $< '$(@D)' && \
+	sudo systemctl daemon-reload && \
+	sudo systemctl enable '$(@F)' && \
+	sudo systemctl reload '$(@F)'
 
 # Generate 'fullchain.pem' and 'privkey.pem' symlinks in:
 # certificates/config/live/eternal.media.mit.edu/
