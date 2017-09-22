@@ -17,7 +17,7 @@ nginx/nginx.conf: nginx/nginx.template.conf
 	env HTTPS_REDIRECT=${HTTPS_REDIRECT} \
 	envsubst '$$HTTPS_REDIRECT' < nginx/nginx.template.conf > nginx/nginx.conf
 
-nginx-install: nginx/nginx.conf
+nginx-install: nginx/nginx.conf webroot
 	sudo cp nginx/nginx.conf /etc/nginx/ && sudo nginx -s reload
 
 # The prod-client and dev-client targets fully remove the public dir, and re-
@@ -28,7 +28,7 @@ prod-client:
 dev-client:
 	cd eternal-js && npm run build:dev && cd .. && rm -rf $(PUBLIC_DIR) && cp -R eternal-js/development $(PUBLIC_DIR)
 
-# Services!
+# Services. This is just a handy shortcut for the pattern rule below
 services: /etc/systemd/system/synk-ws.service /etc/systemd/system/synk-sim.service
 
 /etc/systemd/system/%.service: systemd/%.service
@@ -99,7 +99,7 @@ certbot:
 webroot:
 	mkdir -p webroot
 
-.PHONY: image dev-client prod-client dev-certificate gotools golibs eternal-http nginx-conf services
+.PHONY: image dev-client prod-client dev-certificate gotools golibs eternal-http nginx-install services
 
 debug:
 	@echo $(PWD)
