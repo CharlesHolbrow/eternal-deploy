@@ -35,7 +35,7 @@ services: /etc/systemd/system/synk-ws.service /etc/systemd/system/synk-sim.servi
 	sudo cp $< '$(@D)' && \
 	sudo systemctl daemon-reload && \
 	sudo systemctl enable '$(@F)' && \
-	sudo systemctl reload '$(@F)'
+	sudo systemctl restart '$(@F)'
 
 # Generate 'fullchain.pem' and 'privkey.pem' symlinks in:
 # certificates/config/live/eternal.media.mit.edu/
