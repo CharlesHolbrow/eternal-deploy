@@ -1,0 +1,17 @@
+[Unit]
+Description=Run a synk simulation
+After=network.target redis-server.service
+
+[Service]
+Type=simple
+WorkingDirectory=/eternal
+ExecStart=/eternal/gopath/bin/eternal-action
+# Because no ExecStop target is not provided this will be killed immediately on
+# 'stop' or 'restart'.
+Restart=on-failure
+RestartSec=10
+User=charles
+Environment=SYNK_ENV=production
+
+[Install]
+WantedBy=multi-user.target

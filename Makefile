@@ -9,19 +9,10 @@ GOCODE := $(GOPATH)/src/github.com/CharlesHolbrow
 PUBLIC_DIR := ./public
 ETERNAL_SOURCES := $(shell find $(GOCODE)/eternal $(GOCODE)/eternal-http $(GOCODE)/synk $(GOCODE)/eternal-action -name \*.go)
 
-# The default target builds all the images that will be used by `docker-compose up`
+
 # This is designed to run in production.
 #
 # This does not generate a tls certificate.
-#
-# Note that `docker-compose up` will automatically create folders that do not
-# exist if they are required for host volumes. However, these folders will be
-# owned by root. Then when we try to create certificates and copy them into
-# webroot, certbot will not have permission to put the .well_known files there.
-# For that reason, we list 'webroot' as a pre-requisite to the images target.
-images: golibs eternal-http eternal-action webroot
-	docker-compose build
-
 nginx/nginx.conf: nginx/nginx.template.conf
 	env HTTPS_REDIRECT=${HTTPS_REDIRECT} \
 	envsubst '$$HTTPS_REDIRECT' < nginx/nginx.template.conf > nginx/nginx.conf
@@ -36,6 +27,9 @@ prod-client:
 
 dev-client:
 	cd eternal-js && npm run build:dev && cd .. && rm -rf $(PUBLIC_DIR) && cp -R eternal-js/development $(PUBLIC_DIR)
+
+services: $(shell find /systemd -name \*.service)
+	sudo cp $? /etc/systemd/system/ # todo: restart services!
 
 # Generate 'fullchain.pem' and 'privkey.pem' symlinks in:
 # certificates/config/live/eternal.media.mit.edu/
@@ -99,7 +93,7 @@ certbot:
 webroot:
 	mkdir -p webroot
 
-.PHONY: image dev-client prod-client dev-certificate gotools golibs eternal-http nginx-conf
+.PHONY: image dev-client prod-client dev-certificate gotools golibs eternal-http nginx-conf services
 
 debug:
 	@echo $(PWD)
