@@ -19,14 +19,15 @@ ETERNAL_SOURCES := $(shell find $(GOCODE)/eternal $(GOCODE)/eternal-http $(GOCOD
 # owned by root. Then when we try to create certificates and copy them into
 # webroot, certbot will not have permission to put the .well_known files there.
 # For that reason, we list 'webroot' as a pre-requisite to the images target.
-images: Dockerfile_main Dockerfile_synk Dockerfile_action golibs docker-compose.yml eternal-http-linux eternal-action-linux webroot
+images: golibs eternal-http eternal-action webroot
 	docker-compose build
 
-nginx-conf:
-	env HTTPS_REDIRECT=${HTTPS_REDIRECT}; \
-	envsubst '$$HTTPS_REDIRECT' < nginx/nginx.template.conf > /etc/nginx/nginx.conf && \
-	nginx -s reload
+nginx/nginx.conf: nginx/nginx.template.conf
+	env HTTPS_REDIRECT=${HTTPS_REDIRECT} \
+	envsubst '$$HTTPS_REDIRECT' < nginx/nginx.template.conf > nginx/nginx.conf
 
+nginx-install: nginx/nginx.conf
+	sudo cp nginx/nginx.conf /etc/nginx/ && sudo nginx -s reload
 
 # The prod-client and dev-client targets fully remove the public dir, and re-
 # copy the contents over.
@@ -51,7 +52,7 @@ dev-client:
 # This target is NOT intended to be run with sudo. Sudo causes it to run
 # incorrectly.
 #
-# the docker nginx container must be running or this will not work
+# nginx must be running or this will not work
 prod-certificate: certificates certbot webroot
 	echo; echo "Production Certificate for $(HOST)"; \
 	certbot certonly \
@@ -64,7 +65,7 @@ prod-certificate: certificates certbot webroot
 	--agree-tos \
 	-n && \
 	cp certbot/config/live/$(HOST)/*.pem certificates && \
-	docker-compose exec main nginx -s reload
+	sudo nginx -s reload
 
 # Consider using this chrome feature in development
 # chrome://flags/#allow-insecure-localhost
@@ -88,12 +89,6 @@ gotools: $(GOCODE)/synk $(GOCODE)/pagen $(GOPATH)/bin/pagen
 golibs: $(GOCODE)/eternal $(GOCODE)/eternal-http $(GOCODE)/synk $(GOPATH)/bin/eternal-http
 
 eternal-http: $(GOPATH)/bin/eternal-http
-
-eternal-http-linux: $(ETERNAL_SOURCES)
-	env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o $@ github.com/CharlesHolbrow/eternal-http
-
-eternal-action-linux: $(ETERNAL_SOURCES)
-	env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o $@ github.com/CharlesHolbrow/eternal-action
 
 certificates:
 	mkdir -p certificates
