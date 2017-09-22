@@ -1,6 +1,7 @@
 SHELL := /bin/bash
 
 HOST?=eternal.media.mit.edu
+HTTPS_REDIRECT?=$(HOST)
 
 PWD := $(shell pwd)
 GOPATH := $(PWD)/gopath
@@ -20,6 +21,10 @@ ETERNAL_SOURCES := $(shell find $(GOCODE)/eternal $(GOCODE)/eternal-http $(GOCOD
 # For that reason, we list 'webroot' as a pre-requisite to the images target.
 images: Dockerfile_main Dockerfile_synk Dockerfile_action golibs docker-compose.yml eternal-http-linux eternal-action-linux webroot
 	docker-compose build
+
+nginx-conf:
+	envsubst '$HTTPS_REDIRECT' < nginx/nginx.template.conf > /etc/nginx/nginx.conf && nginx -s reload
+
 
 # The prod-client and dev-client targets fully remove the public dir, and re-
 # copy the contents over.
@@ -97,7 +102,7 @@ certbot:
 webroot:
 	mkdir -p webroot
 
-.PHONY: image dev-client prod-client dev-certificate gotools golibs eternal-http
+.PHONY: image dev-client prod-client dev-certificate gotools golibs eternal-http nginx-conf
 
 debug:
 	@echo $(PWD)
