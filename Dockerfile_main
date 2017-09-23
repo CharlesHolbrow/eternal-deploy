@@ -1,8 +1,0 @@
-# This container is responsible for:
-# - TLS security
-# - Redirects to https
-# - Serving static files
-# - Proxying Websocket connections
-FROM nginx:alpine
-EXPOSE 3000 3001
-COPY nginx/ /etc/nginx/

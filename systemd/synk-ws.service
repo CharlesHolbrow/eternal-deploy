@@ -1,0 +1,17 @@
+[Unit]
+Description=Synk WebSocket Server
+After=network.target redis-server.service
+
+[Service]
+Type=simple
+WorkingDirectory=/synk
+ExecStart=/synk/gopath/bin/eternal-http
+# Because no ExecStop target is not provided this will be killed immediately on
+# 'stop' or 'restart'.
+Restart=on-failure
+RestartSec=5
+User=charles
+Environment=SYNK_ENV=production
+
+[Install]
+WantedBy=multi-user.target
