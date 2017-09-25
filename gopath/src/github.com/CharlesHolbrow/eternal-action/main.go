@@ -29,10 +29,12 @@ func main() {
 	part.AddNote(&eternal.Note{})
 
 	// remove a random object
-	for _, note := range part.Notes {
-		synkConn.Delete(note)
-		delete(part.Notes, note.Key())
-		break
+	if len(part.Notes) > 3 {
+		for _, note := range part.Notes {
+			synkConn.Delete(note)
+			delete(part.Notes, note.Key())
+			break
+		}
 	}
 
 	for {
