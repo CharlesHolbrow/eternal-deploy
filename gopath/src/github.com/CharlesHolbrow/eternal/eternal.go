@@ -14,8 +14,7 @@ import (
 type Note struct {
 	ID     string `json:"id"`
 	SubKey string `json:"subKey"`
-	Number int    `json:"number"`
-	Length int    `json:"length"`
+	Text   string `json:"string"`
 	diff   noteDiff
 }
 

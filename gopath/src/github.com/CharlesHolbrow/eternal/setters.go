@@ -5,16 +5,14 @@ import "github.com/CharlesHolbrow/synk"
 // noteDiff diff type for a character
 type noteDiff struct {
   SubKey *string `json:"subKey,omitempty"`
-  Number *int `json:"number,omitempty"`
-  Length *int `json:"length,omitempty"`
+  Text *string `json:"text,omitempty"`
 }
 
 // State returns a fully populated diff of the unresolved state
 func (o *Note) State() interface{} {
 	d := noteDiff{
     SubKey: &o.SubKey,
-    Number: &o.Number,
-    Length: &o.Length,
+    Text: &o.Text,
   }
   return d
 }
@@ -22,8 +20,7 @@ func (o *Note) State() interface{} {
 // Resolve applies the current diff, then returns it
 func (o *Note) Resolve() interface{} {
   if o.diff.SubKey != nil {o.SubKey = *o.diff.SubKey}
-  if o.diff.Number != nil {o.Number = *o.diff.Number}
-  if o.diff.Length != nil {o.Length = *o.diff.Length}
+  if o.diff.Text != nil {o.Text = *o.diff.Text}
   diff := o.diff
   o.diff = noteDiff{}
   return diff
@@ -32,8 +29,7 @@ func (o *Note) Resolve() interface{} {
 // Changed checks if struct has been changed since the last .Resolve()
 func (o *Note) Changed() bool {
   return o.diff.SubKey != nil ||
-		o.diff.Number != nil ||
-		o.diff.Length != nil
+		o.diff.Text != nil
 }
 
 // TypeKey getter for main and diff structs
@@ -88,44 +84,25 @@ func (o *Note) GetSubKey() string {
 }
 // GetSubKey. Diff method
 func (o noteDiff) GetSubKey() *string { return o.SubKey }
-// SetNumber on diff
-func (o *Note) SetNumber(v int) {
-  if v != o.Number {
-    o.diff.Number = &v
+// SetText on diff
+func (o *Note) SetText(v string) {
+  if v != o.Text {
+    o.diff.Text = &v
   } else {
-    o.diff.Number = nil
+    o.diff.Text = nil
   }
 }
-// GetPrevNumber Gets the previous value. Ignores diff.
-func (o *Note) GetPrevNumber() int { return o.Number }
-// GetNumber from diff. Fall back to current value if no diff
-func (o *Note) GetNumber() int {
-	if o.diff.Number != nil {
-		return *o.diff.Number
+// GetPrevText Gets the previous value. Ignores diff.
+func (o *Note) GetPrevText() string { return o.Text }
+// GetText from diff. Fall back to current value if no diff
+func (o *Note) GetText() string {
+	if o.diff.Text != nil {
+		return *o.diff.Text
 	}
-	return o.Number
+	return o.Text
 }
-// GetNumber. Diff method
-func (o noteDiff) GetNumber() *int { return o.Number }
-// SetLength on diff
-func (o *Note) SetLength(v int) {
-  if v != o.Length {
-    o.diff.Length = &v
-  } else {
-    o.diff.Length = nil
-  }
-}
-// GetPrevLength Gets the previous value. Ignores diff.
-func (o *Note) GetPrevLength() int { return o.Length }
-// GetLength from diff. Fall back to current value if no diff
-func (o *Note) GetLength() int {
-	if o.diff.Length != nil {
-		return *o.diff.Length
-	}
-	return o.Length
-}
-// GetLength. Diff method
-func (o noteDiff) GetLength() *int { return o.Length }
+// GetText. Diff method
+func (o noteDiff) GetText() *string { return o.Text }
 // voiceDiff diff type for a character
 type voiceDiff struct {
   SubKey *string `json:"subKey,omitempty"`
@@ -200,16 +177,6 @@ func (o *Voice) Copy() synk.Object {
 // Resolve() will return a diff with all the fields initialized.
 func (o *Voice) Init() {
 	o.diff = o.State().(voiceDiff)
-}
-// GetID returns the ID
-func (o *Voice) GetID() string { return o.ID }
-// SetID -- but only if it has not been set. This helps us avoid accidentally
-// setting it twice. Return the item's ID either way.
-func (o *Voice) SetID(id string) string {
-	if o.ID == "" {
-		o.ID = id
-	}
-	return o.ID
 }
 // SetSubKey on diff
 func (o *Voice) SetSubKey(v string) {
@@ -375,4 +342,14 @@ func (o *Voice) SetLengthsElement(i int, v int) {
 // GetLengthsLength returns the length of the underlying array
 func (o *Voice) GetLengthsLength() int {
 	return len(o.Lengths)
+}
+// GetID returns the ID
+func (o *Voice) GetID() string { return o.ID }
+// SetID -- but only if it has not been set. This helps us avoid accidentally
+// setting it twice. Return the item's ID either way.
+func (o *Voice) SetID(id string) string {
+	if o.ID == "" {
+		o.ID = id
+	}
+	return o.ID
 }
