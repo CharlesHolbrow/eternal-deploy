@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/CharlesHolbrow/eternal"
@@ -41,15 +42,17 @@ func main() {
 		part = eternal.NewFragment(subKey, synkConn)
 	}
 
-	if len(part.Notes) == 0 {
-		neil := "Neil deGrasse Tyson"
-		note := &eternal.Note{
-			Text:   "If you want to assert a truth, first make sure it's not just an opinion that you desperately want to be true.",
-			Attrib: &neil,
-		}
-		err := part.AddNote(note)
+	neil := "Neil deGrasse Tyson"
+	initial := &eternal.Note{
+		Text:   "If you want to assert a truth, first make sure it's not just an opinion that you desperately want to be true.",
+		Attrib: &neil,
+		ID:     strings.Replace(subKey, ":", "|", -1),
+	}
+
+	if _, found := part.Notes[initial.Key()]; !found {
+		fmt.Println("Created initial value:...")
+		err := part.AddNote(initial)
 		fmt.Println("Add Note error:", err)
-		synkConn.Create(note)
 	}
 
 	fmt.Printf("Got %d Notes and %d Voices\n", len(part.Notes), len(part.Voices))

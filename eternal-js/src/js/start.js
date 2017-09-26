@@ -5,7 +5,6 @@ import { Flow as VF } from 'vexflow';
 
 // Local
 import App from './App.js';
-import Transcriber from './Transcriber.js';
 
 // Libs
 window.Kefir = Kefir;
@@ -20,6 +19,20 @@ window.onload = () => {
 
   app.synk.setSubscription(['eternal:main']);
   app.synk.resolve();
+
+  const form = document.getElementById('add');
+
+  form.onsubmit = function (event) {
+    event.preventDefault();
+
+    const elements = [...this.getElementsByTagName('input')];
+    const msg = {};
+
+    // Get all the values, and send resulting JSON
+    elements.forEach((el) => { msg[el.getAttribute('name')] = el.value; });
+    app.synk.connection.send(msg);
+    elements.forEach((el) => { el.value = ''; });
+  };
 };
 
 const preventContextMenu = () => {
@@ -30,3 +43,5 @@ const preventContextMenu = () => {
     return false;
   };
 };
+
+preventContextMenu();
