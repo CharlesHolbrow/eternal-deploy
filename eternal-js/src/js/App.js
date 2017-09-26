@@ -23,7 +23,7 @@ export default class App {
     this.endpoint.subscribe(this.synk.connection.stream);
 
     // Set default classes
-    // this.synk.objects.byKey.createBranch('n').class = Note;
+    this.synk.objects.byKey.createBranch('n').class = Note;
     this.synk.objects.byKey.createBranch('v').class = Voice;
 
     // We could replace 'close' with reconnect'

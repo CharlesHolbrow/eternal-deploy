@@ -24,10 +24,9 @@ func main() {
 	subKey := "eternal:main"
 
 	part := eternal.NewFragment(subKey, synkConn)
-	fmt.Printf("Got %d Notes and %d Voices\n", len(part.Notes), len(part.Voices))
 	time.Sleep(30 * time.Millisecond)
 
-	// If there are no voices, add one
+	// If there are few voices, add one
 	if len(part.Voices) < 3 {
 		voice := &eternal.Voice{
 			SubKey: subKey,
@@ -41,6 +40,19 @@ func main() {
 		conn.Close()
 		part = eternal.NewFragment(subKey, synkConn)
 	}
+
+	if len(part.Notes) == 0 {
+		neil := "Neil deGrasse Tyson"
+		note := &eternal.Note{
+			Text:   "If you want to assert a truth, first make sure it's not just an opinion that you desperately want to be true.",
+			Attrib: &neil,
+		}
+		err := part.AddNote(note)
+		fmt.Println("Add Note error:", err)
+		synkConn.Create(note)
+	}
+
+	fmt.Printf("Got %d Notes and %d Voices\n", len(part.Notes), len(part.Voices))
 
 	// remove a random object
 	// for _, voice := range part.Voices {

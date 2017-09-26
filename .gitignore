@@ -12,3 +12,4 @@ gopath/src/github.com/CharlesHolbrow/*
 .vscode/
 certbot/
 nginx/nginx.conf
+public/

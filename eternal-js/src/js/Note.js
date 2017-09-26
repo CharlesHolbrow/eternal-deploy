@@ -12,7 +12,7 @@ export default class Note {
     this.elementPre = document.createElement('pre');
     this.elementCode = document.createElement('code');
     this.elementPre.appendChild(this.elementCode);
-    this.parent = document.getElementById('root');
+    this.parent = document.getElementById('notes');
     this.state = { key, type: 'Note' };
 
     // Set any additional properties provided by the 'state' argument
