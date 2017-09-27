@@ -9,27 +9,40 @@ export default class Note {
    */
   constructor(key, state, synkObjects) {
     this.synkObjects = synkObjects;
-    this.elementPre = document.createElement('pre');
-    this.elementCode = document.createElement('code');
-    this.elementPre.appendChild(this.elementCode);
+    this.element = document.createElement('div');
     this.parent = document.getElementById('notes');
     this.state = { key, type: 'Note' };
 
     // Set any additional properties provided by the 'state' argument
     if (state !== undefined) this.update(state);
-    this.parent.appendChild(this.elementPre);
+    this.parent.appendChild(this.element);
   }
 
   /**
    * @param {object} state - diff passed by the synk server
    */
   update(state) {
-    Object.assign(this.state, state);
-    this.elementCode.innerText = JSON.stringify(this.state, null, '  ');
+    if (state.hasOwnProperty('text'))
+      this.text = state.text;
 
-    // Draw the musical notation
-    if (typeof state.number === 'number')
-      this.synkObjects.transcriber.setNote(state.number);
+    if (state.hasOwnProperty('links'))
+      this.links = state.links;
+
+    Object.assign(this.state, state);
+  }
+
+  /**
+   * @param {string} newText - the text to change this to
+   */
+  set text(newText) {
+    this.element.textContent = newText;
+  }
+
+  /**
+   * @returns {string} - current text;
+   */
+  get text() {
+    return this.element.textContent;
   }
 
   /**

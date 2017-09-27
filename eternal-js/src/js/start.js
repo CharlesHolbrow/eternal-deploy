@@ -17,7 +17,7 @@ window.App = App;
 window.onload = () => {
   const app = window.app = new App();
 
-  app.synk.setSubscription(['eternal:main']);
+  app.synk.setSubscription(['eternal|main']);
   app.synk.resolve();
 
   const form = document.getElementById('add');

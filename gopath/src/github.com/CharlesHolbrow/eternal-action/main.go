@@ -22,7 +22,7 @@ var env = os.Getenv("SYNK_ENV")
 
 func main() {
 	synkConn := synk.NewConnection(redisAddr)
-	subKey := "eternal:main"
+	subKey := "eternal|main"
 
 	part := eternal.NewFragment(subKey, synkConn)
 	time.Sleep(30 * time.Millisecond)
@@ -42,13 +42,17 @@ func main() {
 		part = eternal.NewFragment(subKey, synkConn)
 	}
 
+	// This app expects there to be a single 'root object' where users begin
+	// their journey.
 	neil := "Neil deGrasse Tyson"
 	initial := &eternal.Note{
 		Text:   "If you want to assert a truth, first make sure it's not just an opinion that you desperately want to be true.",
 		Attrib: &neil,
-		ID:     strings.Replace(subKey, ":", "|", -1),
+		// Note that IDs may not contain a colon character, because this will
+		// interfere with the object loader's type identification.
+		ID: strings.Replace(subKey, ":", "|", -1),
 	}
-
+	// Create the root object in Redis if it was not found.
 	if _, found := part.Notes[initial.Key()]; !found {
 		fmt.Println("Created initial value:...")
 		err := part.AddNote(initial)

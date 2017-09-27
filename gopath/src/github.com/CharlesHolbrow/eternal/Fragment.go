@@ -51,6 +51,9 @@ func (frag *Fragment) AddNote(n *Note) error {
 	if _, ok := frag.Notes[n.Key()]; ok {
 		return fmt.Errorf("Note Already in Fragment: %s-%s", n.Key(), n.Text)
 	}
+
+	frag.Notes[n.Key()] = n
+
 	n.SetSubKey(frag.sKey)
 	frag.synkConn.Create(n)
 	return nil
