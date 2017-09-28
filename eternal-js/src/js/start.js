@@ -31,7 +31,7 @@ window.onload = () => {
     // Get all the values, and send resulting JSON
     elements.forEach((el) => { msg[el.getAttribute('name')] = el.value; });
     app.synk.connection.send(msg);
-    elements.forEach((el) => { el.value = ''; });
+    elements.forEach((el) => { if (el.type !== 'hidden') el.value = ''; });
   };
 };
 

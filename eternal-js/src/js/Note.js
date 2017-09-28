@@ -50,6 +50,6 @@ export default class Note {
    * the synk server.
    */
   teardown() {
-    this.parent.removeChild(this.elementPre);
+    this.parent.removeChild(this.element);
   }
 }
