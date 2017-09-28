@@ -14,11 +14,11 @@ type Fragment struct {
 	Notes    map[string]*Note
 	Voices   map[string]*Voice
 	sKey     string
-	synkConn *synk.RedisConnection
+	synkConn *synk.Synk
 }
 
 // NewFragment - create a Fragment
-func NewFragment(key string, synkConn *synk.RedisConnection) *Fragment {
+func NewFragment(key string, synkConn *synk.Synk) *Fragment {
 	notes := &Fragment{
 		Notes:    make(map[string]*Note),
 		Voices:   make(map[string]*Voice),
