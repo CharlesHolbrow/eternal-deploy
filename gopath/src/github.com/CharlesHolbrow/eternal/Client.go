@@ -25,6 +25,7 @@ func (cc Client) OnMessage(client *synk.Client, method string, data []byte) {
 		if err := json.Unmarshal(data, &anr); err == nil {
 			anr.Time = time.Now()
 			log.Printf("Got message: %v\n", anr)
+			client.Synk.Publish()
 		} else {
 			log.Println("Error handling addNoteRequest:", err.Error())
 		}
@@ -41,5 +42,6 @@ func (cc Client) OnSubscribe(client *synk.Client, subKeys []string, objs []synk.
 type AddNoteRequest struct {
 	Text   string    `json:"text"`
 	Attrib string    `json:"attrib"`
+	Parent string    `json:"parent"`
 	Time   time.Time `json:",omit"`
 }

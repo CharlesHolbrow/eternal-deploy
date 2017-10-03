@@ -34,4 +34,30 @@ export default class App {
       console.log('connection open bySKey.branches: ', Object.keys(this.synk.objects.bySKey.branches));
     });
   }
+
+  /**
+   * @param {string} objKey - the object to focus on.
+   */
+  focus(objKey) {
+    this.synk.objects.focusKey = objKey;
+
+    const obj = this.synk.objects.get(objKey);
+
+    if (!obj) {
+      console.error('Tried to focus on object that does not exist:', objKey);
+
+      return;
+    }
+
+    const focus = document.getElementById('focus');
+    const pool = document.getElementById('pool');
+
+    // Remove existing children from focus group. Return them to the pool
+    for (const child of focus.children) {
+      if (child === obj.element) continue;
+      pool.appendChild(child);
+    }
+
+    focus.appendChild(obj.element);
+  }
 }

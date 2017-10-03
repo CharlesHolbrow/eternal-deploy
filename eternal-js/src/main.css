@@ -6,10 +6,10 @@ html {
   /* overflow: hidden; */
 }
 
-#root {
-  color: #08007E;
+#focus {
+  background-color: rgb(162, 181, 255);
 }
 
-div#staves div {
+div#pool div {
   text-align: center;
 }

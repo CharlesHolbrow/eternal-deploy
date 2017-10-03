@@ -10,12 +10,12 @@ export default class Note {
   constructor(key, state, synkObjects) {
     this.synkObjects = synkObjects;
     this.element = document.createElement('div');
-    this.parent = document.getElementById('notes');
     this.state = { key, type: 'Note' };
 
     // Set any additional properties provided by the 'state' argument
     if (state !== undefined) this.update(state);
-    this.parent.appendChild(this.element);
+
+    document.getElementById('pool').appendChild(this.element);
   }
 
   /**
@@ -50,6 +50,6 @@ export default class Note {
    * the synk server.
    */
   teardown() {
-    this.parent.removeChild(this.element);
+    this.element.parentElement.removeChild(this.element);
   }
 }

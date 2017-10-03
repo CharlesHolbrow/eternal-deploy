@@ -12,8 +12,8 @@ export default class Voice {
   constructor(key, state, synkObjects) {
     this.synkObjects = synkObjects;
     this.element = document.createElement('div');
-    this.parent = document.getElementById('staves');
-    this.parent.appendChild(this.element);
+
+    document.getElementById('pool').appendChild(this.element);
 
     this.state = { key, type: 'Voice' };
     this.transcriber = new Transcriber(this.element);
@@ -58,6 +58,6 @@ export default class Voice {
    * the synk server.
    */
   teardown() {
-    this.parent.removeChild(this.element);
+    this.element.parentElement.removeChild(this.element);
   }
 }
