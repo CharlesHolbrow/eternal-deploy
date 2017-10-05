@@ -1,7 +1,7 @@
 # Eternal
 
-This is a minimal example for running `synk` and `synk-js` in development and
-production.
+Generate some visuals, with text and musical staff notation. This is a small example of how we
+could use `synk` and `synk-js` to create real-time musical experiences.
 
 ## Running In Development
 
