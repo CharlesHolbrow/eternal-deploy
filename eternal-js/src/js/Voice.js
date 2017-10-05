@@ -1,7 +1,7 @@
 import Transcriber from './Transcriber.js';
 
 /**
- * Example object
+ * Musical voice that will be transcribed to staff notation
  */
 export default class Voice {
   /**
@@ -10,8 +10,9 @@ export default class Voice {
    * @param {synk.Objects} synkObjects - this app's Objects
    */
   constructor(key, state, synkObjects) {
-    this.synkObjects = synkObjects;
+    this.key = key;
     this.element = document.createElement('div');
+    this.element.onclick = () => { synkObjects.emit('click', this); };
 
     this.state = { key, type: 'Voice' };
     this.transcriber = new Transcriber(this.element);

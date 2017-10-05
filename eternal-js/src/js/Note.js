@@ -8,10 +8,12 @@ export default class Note {
    * @param {synk.Objects} synkObjects - this app's Objects
    */
   constructor(key, state, synkObjects) {
-    this.synkObjects = synkObjects;
+    this.key = key;
     this.element = document.createElement('div');
     this.type = 'Note';
     this.links = [null, null, null];
+
+    this.element.onclick = () => { synkObjects.emit('click', this); };
 
     // Set any additional properties provided by the 'state' argument
     this.update(state);

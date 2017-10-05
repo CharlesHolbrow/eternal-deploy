@@ -49,6 +49,10 @@ export default class App {
 
     this.synk.objects.on('mod', () => { this.updateLinks(); });
 
+    this.synk.objects.on('click', (obj) => {
+      if (obj.element && obj.key) this.focus(obj.key);
+    });
+
     this.focusKey = null;
     this.focusObject = null;
     this.linkObjects = [null, null, null];
