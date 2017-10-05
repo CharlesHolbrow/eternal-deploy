@@ -3,7 +3,6 @@ package eternal
 import (
 	"encoding/json"
 	"log"
-	"time"
 
 	"github.com/CharlesHolbrow/synk"
 )
@@ -21,11 +20,13 @@ func (cc Client) OnConnect(client *synk.Client) {
 func (cc Client) OnMessage(client *synk.Client, method string, data []byte) {
 	log.Println("Custom Client Message:", method)
 	if method == "addNote" {
-		anr := AddNoteRequest{}
-		if err := json.Unmarshal(data, &anr); err == nil {
-			anr.Time = time.Now()
-			log.Printf("Got message: %v\n", anr)
-			client.Synk.Publish()
+		anr := &AddNoteRequest{}
+		if err := json.Unmarshal(data, anr); err == nil {
+			if sendMe, err := json.Marshal(anr); err != nil {
+				log.Println("Faile to re-marshall JSON from client:", err.Error())
+			} else {
+				client.Synk.Publish("test|eternal.AddNoteRequest", sendMe)
+			}
 		} else {
 			log.Println("Error handling addNoteRequest:", err.Error())
 		}
@@ -40,8 +41,7 @@ func (cc Client) OnSubscribe(client *synk.Client, subKeys []string, objs []synk.
 
 //AddNoteRequest represents a request from the client to add a note
 type AddNoteRequest struct {
-	Text   string    `json:"text"`
-	Attrib string    `json:"attrib"`
-	Parent string    `json:"parent"`
-	Time   time.Time `json:",omit"`
+	Text   string `json:"text"`
+	Attrib string `json:"attrib"`
+	Parent string `json:"parent"`
 }

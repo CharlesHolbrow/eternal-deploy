@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"os"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/CharlesHolbrow/eternal"
 	"github.com/CharlesHolbrow/synk"
+	"github.com/garyburd/redigo/redis"
 )
 
 // By default, look for redis locally at ":6379". We may specify another host by
@@ -68,11 +70,56 @@ func main() {
 	// 	break
 	// }
 
+	// Remember that we must not close a connection retrieved from a pool
+	// without unsubscribing from all keys.
+	psc := redis.PubSubConn{Conn: synkConn.Pool.Get()}
+	psc.Subscribe("test|eternal.AddNoteRequest")
+	fromRedis := make(chan eternal.AddNoteRequest)
+
+	go func() {
+		for {
+			switch v := psc.Receive().(type) {
+			case redis.Message:
+				msg := eternal.AddNoteRequest{}
+				err := json.Unmarshal(v.Data, &msg)
+				if err != nil {
+					fmt.Printf("Got bad message from client %v\n", err)
+				} else {
+					fromRedis <- msg
+				}
+			case redis.Subscription:
+				fmt.Printf("%s: %s %d\n", v.Channel, v.Kind, v.Count)
+			case error:
+				fmt.Printf("Error from redis subscription %s\n", v.Error())
+			}
+		}
+	}()
+
+	ticker := time.NewTicker(time.Second * 10)
 	for {
-		for _, v := range part.Voices {
-			v.SetNotesElement(rand.Intn(4), rand.Intn(7))
-			synkConn.Modify(v)
-			time.Sleep(time.Second)
+		select {
+		case <-ticker.C:
+			for _, v := range part.Voices {
+				v.SetNotesElement(rand.Intn(4), rand.Intn(7))
+				synkConn.Modify(v)
+			}
+		case msg := <-fromRedis:
+			if parent, ok := part.Notes[msg.Parent]; !ok {
+				fmt.Println("Parent Not Found:", parent)
+			} else {
+				newNote := &eternal.Note{}
+				newNote.SetSubKey(parent.GetSubKey())
+				newNote.SetID(synk.NewID().String())
+				newNote.SetText(msg.Text)
+
+				if err := parent.AddLink(newNote.Key()); err != nil {
+					fmt.Println("Error Adding link to parent:", err)
+				} else {
+					synkConn.Modify(parent)
+					synkConn.Create(newNote)
+				}
+			}
+			fmt.Printf("Got Msg %v\n", msg)
 		}
 	}
 }

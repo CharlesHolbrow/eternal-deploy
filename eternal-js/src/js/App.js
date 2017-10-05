@@ -35,40 +35,136 @@ export default class App {
       console.log('connection open bySKey.branches: ', Object.keys(this.synk.objects.bySKey.branches));
     });
 
-    const pool = document.getElementById('pool');
+    this.pool = document.getElementById('pool');
 
     this.synk.objects.on('add', (obj) => {
-      if (obj.element) pool.appendChild(obj.element);
+      this.addObject(obj);
+      this.updateLinks();
     });
 
     this.synk.objects.on('rem', (obj) => {
       if (obj.element && obj.element.parentElement) obj.element.parentElement.removeChild(obj.element);
+      this.updateLinks();
     });
+
+    this.synk.objects.on('mod', () => { this.updateLinks(); });
+
+    this.focusKey = null;
+    this.focusObject = null;
+    this.linkObjects = [null, null, null];
+
+    // default focus object is hard-coded
+    this.focus('n:eternal|main');
   }
 
   /**
    * @param {string} objKey - the object to focus on.
    */
   focus(objKey) {
-    this.synk.objects.focusKey = objKey;
+    this.focusKey = objKey;
 
     const obj = this.synk.objects.get(objKey);
 
     if (!obj) {
-      console.error('Tried to focus on object that does not exist:', objKey);
+      console.warn('Tried to focus on object that does not exist:', objKey);
+      this.updateLinks();
 
       return;
     }
 
-    const focus = document.getElementById('focus');
-    const pool = document.getElementById('pool');
+    this.focusOnObject(obj);
+    this.updateLinks();
+  }
 
-    // Remove existing children from focus group. Return them to the pool
-    for (const child of focus.children) {
-      if (child === obj.element) continue;
-      pool.appendChild(child);
+  /**
+   * Add an object to the correct place.
+   *
+   * focus on the object if focusKey has been set.
+   *
+   * No-op of object has no .element
+   *
+   * @param {Object} object - object to add
+   */
+  addObject(object) {
+    if (!object.element) return;
+
+    this.pool.appendChild(object.element);
+
+    if (object.key === this.focusKey) this.focusOnObject(object);
+  }
+
+  /**
+   * Set focus exclusively on a single object. This should probably only be
+   * called indirectly by .focus()
+   *
+   * @param {Object} object - object with element to focus on
+   */
+  focusOnObject(object) {
+    if (!object.element) {
+      console.error('cannot focus on an object with no .element');
+
+      return;
     }
 
-    focus.appendChild(obj.element);
+    for (const element of document.getElementsByClassName('focus'))
+      if (element !== object.element) element.classList.remove('focus');
+
+    this.focusObject = object;
+    object.element.classList.add('focus');
+  }
+
+  /**
+   * Set the 'link' 'l0' 'l1' 'l2' and html classes to the appropriate objects
+   *
+   * each of the l0 l1 l2 classes should be on zero or more elements
+   * link should be on zero to three elements
+   */
+  updateLinks() {
+    if (!this.focusObject || !this.focusObject.links) {
+      for (const object of this.linkObjects)
+        if (object) object.element.classList.remove('link', 'l0', 'l1', 'l2');
+
+      this.linkObjects = [null, null, null];
+
+      return;
+    }
+
+    if (!this.focusObject.links) return;
+
+    this.focusObject.links.forEach((key, index) => {
+      this.setLink(key, index);
+    });
+  }
+
+  /**
+   * Set a linked object. Remove old link if any
+   * 
+   * @param {String} objectKey - the key of the object to set
+   * @param {Number} index - 0, 1, or 2 - the index we will set the link to
+   */
+  setLink(objectKey, index) {
+    const lClass = `l${index}`;
+    const currentObject = this.linkObjects[index];
+
+    if (!objectKey || objectKey === '') {
+      if (currentObject) {
+        currentObject.element.classList.remove('link', lClass);
+        this.linkObjects[index] = null;
+      }
+
+      return;
+    }
+
+    // we are trying to find a new object
+    if (currentObject) {
+      currentObject.element.classList.remove('link', lClass);
+    }
+
+    const newObject = this.synk.objects.get(objectKey);
+
+    if (newObject) {
+      this.linkObjects[index] = newObject;
+      newObject.element.classList.add('link', lClass);
+    }
   }
 }

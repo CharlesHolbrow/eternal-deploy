@@ -6,9 +6,14 @@ html {
   /* overflow: hidden; */
 }
 
-#focus {
+.focus {
   background-color: rgb(162, 181, 255);
 }
+
+.link {
+  background-color: rgb(255, 162, 162);
+}
+
 
 div#pool div {
   text-align: center;

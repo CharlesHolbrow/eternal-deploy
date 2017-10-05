@@ -10,23 +10,33 @@ export default class Note {
   constructor(key, state, synkObjects) {
     this.synkObjects = synkObjects;
     this.element = document.createElement('div');
-    this.state = { key, type: 'Note' };
+    this.type = 'Note';
+    this.links = [null, null, null];
 
     // Set any additional properties provided by the 'state' argument
-    if (state !== undefined) this.update(state);
+    this.update(state);
   }
 
   /**
    * @param {object} state - diff passed by the synk server
    */
   update(state) {
-    if (state.hasOwnProperty('text'))
+    if (state.hasOwnProperty('text')) {
       this.text = state.text;
+      delete state.text;
+    }
 
-    if (state.hasOwnProperty('links'))
+    if (state.hasOwnProperty('links')) {
       this.links = state.links;
+      delete state.links;
+    }
 
-    Object.assign(this.state, state);
+    if (state.hasOwnProperty('linksDiff')) {
+      Object.assign(this.links, state.linksDiff);
+      delete state.linksDiff;
+    }
+
+    Object.assign(this, this.state);
   }
 
   /**

@@ -26,7 +26,7 @@ window.onload = () => {
     event.preventDefault();
 
     const elements = [...this.getElementsByTagName('input')];
-    const msg = {};
+    const msg = { parent: app.focusKey };
 
     // Get all the values, and send resulting JSON
     elements.forEach((el) => { msg[el.getAttribute('name')] = el.value; });
