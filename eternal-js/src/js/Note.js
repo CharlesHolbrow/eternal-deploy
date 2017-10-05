@@ -14,8 +14,6 @@ export default class Note {
 
     // Set any additional properties provided by the 'state' argument
     if (state !== undefined) this.update(state);
-
-    document.getElementById('pool').appendChild(this.element);
   }
 
   /**
@@ -49,7 +47,5 @@ export default class Note {
    * Called when this object leaves our subscription area, or is removed from
    * the synk server.
    */
-  teardown() {
-    this.element.parentElement.removeChild(this.element);
-  }
+  teardown() {}
 }

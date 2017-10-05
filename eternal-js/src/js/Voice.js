@@ -13,16 +13,8 @@ export default class Voice {
     this.synkObjects = synkObjects;
     this.element = document.createElement('div');
 
-    document.getElementById('pool').appendChild(this.element);
-
     this.state = { key, type: 'Voice' };
     this.transcriber = new Transcriber(this.element);
-    // Initial state will provided on construction will be full arrays
-    // state provided to update calls will be objects
-    this.notes = state.notes;
-    this.lengths = state.lengths;
-    delete state.notes;
-    delete state.lengths;
 
     // Set any additional properties provided by the 'state' argument
     this.update(state);
@@ -57,7 +49,5 @@ export default class Voice {
    * Called when this object leaves our subscription area, or is removed from
    * the synk server.
    */
-  teardown() {
-    this.element.parentElement.removeChild(this.element);
-  }
+  teardown() {}
 }

@@ -1,4 +1,5 @@
 import { Objects, Connection, Synk }  from 'synk-js';
+
 import AppEndpoint from './AppEndpoint.js';
 import Note from './Note.js';
 import Voice from './Voice.js';
@@ -32,6 +33,16 @@ export default class App {
     });
     this.synk.connection.on('open', () => {
       console.log('connection open bySKey.branches: ', Object.keys(this.synk.objects.bySKey.branches));
+    });
+
+    const pool = document.getElementById('pool');
+
+    this.synk.objects.on('add', (obj) => {
+      if (obj.element) pool.appendChild(obj.element);
+    });
+
+    this.synk.objects.on('rem', (obj) => {
+      if (obj.element && obj.element.parentElement) obj.element.parentElement.removeChild(obj.element);
     });
   }
 
