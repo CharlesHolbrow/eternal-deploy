@@ -110,11 +110,14 @@ export default class App {
       return;
     }
 
-    for (const element of document.getElementsByClassName('focus'))
-      if (element !== object.element) element.classList.remove('focus');
+    if (this.focusObject && this.focusObject.element) {
+      this.focusObject.element.classList.remove('focus');
+      this.focusObject.updatePosition();
+    }
 
-    this.focusObject = object;
     object.element.classList.add('focus');
+    this.focusObject = object;
+    this.focusObject.updatePosition();
   }
 
   /**
@@ -125,8 +128,12 @@ export default class App {
    */
   updateLinks() {
     if (!this.focusObject || !this.focusObject.links) {
-      for (const object of this.linkObjects)
-        if (object) object.element.classList.remove('link', 'l0', 'l1', 'l2');
+      for (const object of this.linkObjects) {
+        if (object) {
+          object.element.classList.remove('link', 'l0', 'l1', 'l2');
+          object.updatePosition();
+        }
+      }
 
       this.linkObjects = [null, null, null];
 
@@ -153,6 +160,7 @@ export default class App {
     if (!objectKey || objectKey === '') {
       if (currentObject) {
         currentObject.element.classList.remove('link', lClass);
+        currentObject.updatePosition();
         this.linkObjects[index] = null;
       }
 
@@ -162,6 +170,7 @@ export default class App {
     // we are trying to find a new object
     if (currentObject) {
       currentObject.element.classList.remove('link', lClass);
+      currentObject.updatePosition();
     }
 
     const newObject = this.synk.objects.get(objectKey);
@@ -169,6 +178,7 @@ export default class App {
     if (newObject) {
       this.linkObjects[index] = newObject;
       newObject.element.classList.add('link', lClass);
+      newObject.updatePosition();
     }
   }
 }

@@ -12,6 +12,11 @@ export default class Note extends Node {
   constructor(key, state, synkObjects) {
     super(key, state, synkObjects);
 
+    this.type = 'note';
+    this.span = document.createElement('span');
+    this.span.onclick = () => { synkObjects.emit('click', this); };
+    this.element.appendChild(this.span);
+
     // Set any additional properties provided by the 'state' argument
     this.update(state);
   }
@@ -21,6 +26,7 @@ export default class Note extends Node {
    */
   update(state) {
     super.update(state);
+    this.element.onclick = null;
 
     if (state.hasOwnProperty('text')) {
       this.text = state.text;
@@ -34,13 +40,17 @@ export default class Note extends Node {
    * @param {string} newText - the text to change this to
    */
   set text(newText) {
-    this.element.textContent = newText;
+    this.span.textContent = newText;
   }
 
   /**
    * @returns {string} - current text;
    */
   get text() {
-    return this.element.textContent;
+    return this.span.textContent;
+  }
+
+  teardown() {
+    this.span.onclick = null;
   }
 }

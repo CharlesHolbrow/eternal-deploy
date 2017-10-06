@@ -13,7 +13,9 @@ export default class Voice extends Node {
   constructor(key, state, synkObjects) {
     super(key, state, synkObjects);
 
+    this.element.onclick = () => { synkObjects.emit('click', this); };
     this.transcriber = new Transcriber(this.element);
+    this.type = 'voice';
 
     // Set any additional properties provided by the 'state' argument
     this.update(state);
@@ -44,5 +46,9 @@ export default class Voice extends Node {
    */
   render() {
     this.transcriber.setNotes(this.notes, this.lengths);
+  }
+
+  teardown() {
+    this.element.onclick = null;
   }
 }
