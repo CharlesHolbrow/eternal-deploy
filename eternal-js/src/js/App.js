@@ -15,6 +15,10 @@ export default class App {
     const https = window.location.protocol.startsWith('https');
     const url =  `${https ? 'wss' : 'ws'}://${window.location.host}/ws`;
 
+    this.focusKey = null;
+    this.focusObject = null;
+    this.linkObjects = [null, null, null];
+
     this.synk = new Synk(url);
     this.endpoint = new AppEndpoint(this);
 
@@ -52,10 +56,6 @@ export default class App {
     this.synk.objects.on('click', (obj) => {
       if (obj.element && obj.key) this.focus(obj.key);
     });
-
-    this.focusKey = null;
-    this.focusObject = null;
-    this.linkObjects = [null, null, null];
 
     // default focus object is hard-coded
     this.focus('n:eternal|main');
