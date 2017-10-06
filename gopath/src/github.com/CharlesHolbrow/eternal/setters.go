@@ -4,20 +4,20 @@ import "github.com/CharlesHolbrow/synk"
 
 // noteDiff diff type for a character
 type noteDiff struct {
-  Text *string `json:"text,omitempty"`
   Links *[3]string `json:"links,omitempty"`
   LinksDiff map[int]string `json:"linksDiff,omitempty"`
   Attrib **string `json:"attrib,omitempty"`
   SubKey *string `json:"subKey,omitempty"`
+  Text *string `json:"text,omitempty"`
 }
 
 // State returns a fully populated diff of the unresolved state
 func (o *Note) State() interface{} {
 	d := noteDiff{
-    Text: &o.Text,
     Links: &o.Links,
     Attrib: &o.Attrib,
     SubKey: &o.SubKey,
+    Text: &o.Text,
   }
   if o.Attrib == nil { d.Attrib = nil }
   return d
@@ -25,7 +25,6 @@ func (o *Note) State() interface{} {
 
 // Resolve applies the current diff, then returns it
 func (o *Note) Resolve() interface{} {
-  if o.diff.Text != nil {o.Text = *o.diff.Text}
 
 	if o.diff.Links != nil {
 		o.Links = *o.diff.Links
@@ -36,6 +35,7 @@ func (o *Note) Resolve() interface{} {
 	}
   if o.diff.Attrib != nil {o.Attrib = *o.diff.Attrib}
   if o.diff.SubKey != nil {o.SubKey = *o.diff.SubKey}
+  if o.diff.Text != nil {o.Text = *o.diff.Text}
   diff := o.diff
   o.diff = noteDiff{}
   return diff
@@ -43,11 +43,11 @@ func (o *Note) Resolve() interface{} {
 
 // Changed checks if struct has been changed since the last .Resolve()
 func (o *Note) Changed() bool {
-  return o.diff.Text != nil ||
-		o.diff.Links != nil ||
+  return o.diff.Links != nil ||
 		o.diff.LinksDiff != nil ||
 		o.diff.Attrib != nil ||
-		o.diff.SubKey != nil
+		o.diff.SubKey != nil ||
+		o.diff.Text != nil
 }
 
 // TypeKey getter for main and diff structs
@@ -73,25 +73,6 @@ func (o *Note) Copy() synk.Object {
 func (o *Note) Init() {
 	o.diff = o.State().(noteDiff)
 }
-// SetText on diff
-func (o *Note) SetText(v string) {
-  if v != o.Text {
-    o.diff.Text = &v
-  } else {
-    o.diff.Text = nil
-  }
-}
-// GetPrevText Gets the previous value. Ignores diff.
-func (o *Note) GetPrevText() string { return o.Text }
-// GetText from diff. Fall back to current value if no diff
-func (o *Note) GetText() string {
-	if o.diff.Text != nil {
-		return *o.diff.Text
-	}
-	return o.Text
-}
-// GetText. Diff method
-func (o noteDiff) GetText() *string { return o.Text }
 // SetLinks on diff
 func (o *Note) SetLinks(v [3]string) {
   if v != o.Links {
@@ -213,28 +194,49 @@ func (o *Note) GetSubKey() string {
 }
 // GetSubKey. Diff method
 func (o noteDiff) GetSubKey() *string { return o.SubKey }
+// SetText on diff
+func (o *Note) SetText(v string) {
+  if v != o.Text {
+    o.diff.Text = &v
+  } else {
+    o.diff.Text = nil
+  }
+}
+// GetPrevText Gets the previous value. Ignores diff.
+func (o *Note) GetPrevText() string { return o.Text }
+// GetText from diff. Fall back to current value if no diff
+func (o *Note) GetText() string {
+	if o.diff.Text != nil {
+		return *o.diff.Text
+	}
+	return o.Text
+}
+// GetText. Diff method
+func (o noteDiff) GetText() *string { return o.Text }
 // voiceDiff diff type for a character
 type voiceDiff struct {
-  SubKey *string `json:"subKey,omitempty"`
   Notes *[16]int `json:"notes,omitempty"`
   NotesDiff map[int]int `json:"notesDiff,omitempty"`
   Lengths *[16]int `json:"lengths,omitempty"`
   LengthsDiff map[int]int `json:"lengthsDiff,omitempty"`
+  Links *[3]string `json:"links,omitempty"`
+  LinksDiff map[int]string `json:"linksDiff,omitempty"`
+  SubKey *string `json:"subKey,omitempty"`
 }
 
 // State returns a fully populated diff of the unresolved state
 func (o *Voice) State() interface{} {
 	d := voiceDiff{
-    SubKey: &o.SubKey,
     Notes: &o.Notes,
     Lengths: &o.Lengths,
+    Links: &o.Links,
+    SubKey: &o.SubKey,
   }
   return d
 }
 
 // Resolve applies the current diff, then returns it
 func (o *Voice) Resolve() interface{} {
-  if o.diff.SubKey != nil {o.SubKey = *o.diff.SubKey}
 
 	if o.diff.Notes != nil {
 		o.Notes = *o.diff.Notes
@@ -251,6 +253,15 @@ func (o *Voice) Resolve() interface{} {
 			o.Lengths[i] = v
 		}
 	}
+
+	if o.diff.Links != nil {
+		o.Links = *o.diff.Links
+	} else if o.diff.LinksDiff != nil {
+		for i, v := range o.diff.LinksDiff {
+			o.Links[i] = v
+		}
+	}
+  if o.diff.SubKey != nil {o.SubKey = *o.diff.SubKey}
   diff := o.diff
   o.diff = voiceDiff{}
   return diff
@@ -258,11 +269,13 @@ func (o *Voice) Resolve() interface{} {
 
 // Changed checks if struct has been changed since the last .Resolve()
 func (o *Voice) Changed() bool {
-  return o.diff.SubKey != nil ||
-		o.diff.Notes != nil ||
+  return o.diff.Notes != nil ||
 		o.diff.NotesDiff != nil ||
 		o.diff.Lengths != nil ||
-		o.diff.LengthsDiff != nil
+		o.diff.LengthsDiff != nil ||
+		o.diff.Links != nil ||
+		o.diff.LinksDiff != nil ||
+		o.diff.SubKey != nil
 }
 
 // TypeKey getter for main and diff structs
@@ -288,35 +301,6 @@ func (o *Voice) Copy() synk.Object {
 func (o *Voice) Init() {
 	o.diff = o.State().(voiceDiff)
 }
-// GetID returns the ID
-func (o *Voice) GetID() string { return o.ID }
-// SetID -- but only if it has not been set. This helps us avoid accidentally
-// setting it twice. Return the item's ID either way.
-func (o *Voice) SetID(id string) string {
-	if o.ID == "" {
-		o.ID = id
-	}
-	return o.ID
-}
-// SetSubKey on diff
-func (o *Voice) SetSubKey(v string) {
-  if v != o.SubKey {
-    o.diff.SubKey = &v
-  } else {
-    o.diff.SubKey = nil
-  }
-}
-// GetPrevSubKey Gets the previous value. Ignores diff.
-func (o *Voice) GetPrevSubKey() string { return o.SubKey }
-// GetSubKey from diff. Fall back to current value if no diff
-func (o *Voice) GetSubKey() string {
-	if o.diff.SubKey != nil {
-		return *o.diff.SubKey
-	}
-	return o.SubKey
-}
-// GetSubKey. Diff method
-func (o voiceDiff) GetSubKey() *string { return o.SubKey }
 // SetNotes on diff
 func (o *Voice) SetNotes(v [16]int) {
   if v != o.Notes {
@@ -463,3 +447,105 @@ func (o *Voice) SetLengthsElement(i int, v int) {
 func (o *Voice) GetLengthsLength() int {
 	return len(o.Lengths)
 }
+// SetLinks on diff
+func (o *Voice) SetLinks(v [3]string) {
+  if v != o.Links {
+    o.diff.Links = &v
+  } else {
+    o.diff.Links = nil
+  }
+}
+// GetPrevLinks Gets the previous value. Ignores diff.
+func (o *Voice) GetPrevLinks() [3]string { return o.Links }
+// GetLinks from diff. Fall back to current value if no diff
+func (o *Voice) GetLinks() [3]string {
+	if o.diff.Links != nil {
+		return *o.diff.Links
+	}
+	return o.Links
+}
+// GetLinks. Diff method
+func (o voiceDiff) GetLinks() *[3]string { return o.Links }
+// GetPrevLinksElement returns an element from array. Ignores diff
+func (o *Voice) GetPrevLinksElement(i int) string {
+	return o.Links[i]
+}
+// GetLinksElement returns an element from array
+func (o *Voice) GetLinksElement(i int) string {
+	if o.diff.Links != nil {
+		return o.diff.Links[i]
+	}
+
+	if o.diff.LinksDiff != nil {
+		if v, ok := o.diff.LinksDiff[i]; ok {
+			return v;
+		}
+	}
+	return o.Links[i]
+}
+// SetLinksElement updates a single element in the .Links array.
+// Calling this method will lazily create a map of object changes the object's
+// diff member. These changes will be be applied to the .Links array
+// on the next call to Resolve(). Note that when we .Copy() a Voice, if
+// there is diffMap in the diff object, the the diffMap will be shallow copied
+// to the new object. Usually we Resolve() after calling Copy(), which discards
+// the current .diff, so we do not need to worry about changing the shallow copy
+// on the new Object.
+func (o *Voice) SetLinksElement(i int, v string) {
+	// fail silently if index is out of range
+	if i >= len(o.Links) { return }
+	if o.diff.Links != nil {
+		o.diff.Links[i] = v
+		return
+	}
+	if v != o.Links[i] {
+		if o.diff.LinksDiff == nil {
+			o.diff.LinksDiff = make(map[int]string)
+		}
+		o.diff.LinksDiff[i] = v
+		return
+	}
+	// The new value is the same as the current value. We might need to clear
+	// a value in the diff. If the diff map is empty, remove it. That way the
+	// Changed() method does not have to check the length of the diffMap.
+	if o.diff.LinksDiff == nil {
+		return
+	}
+	delete(o.diff.LinksDiff, i)
+	if len(o.diff.LinksDiff) == 0 {
+		o.diff.LinksDiff = nil
+	}
+}
+// GetLinksLength returns the length of the underlying array
+func (o *Voice) GetLinksLength() int {
+	return len(o.Links)
+}
+// GetID returns the ID
+func (o *Voice) GetID() string { return o.ID }
+// SetID -- but only if it has not been set. This helps us avoid accidentally
+// setting it twice. Return the item's ID either way.
+func (o *Voice) SetID(id string) string {
+	if o.ID == "" {
+		o.ID = id
+	}
+	return o.ID
+}
+// SetSubKey on diff
+func (o *Voice) SetSubKey(v string) {
+  if v != o.SubKey {
+    o.diff.SubKey = &v
+  } else {
+    o.diff.SubKey = nil
+  }
+}
+// GetPrevSubKey Gets the previous value. Ignores diff.
+func (o *Voice) GetPrevSubKey() string { return o.SubKey }
+// GetSubKey from diff. Fall back to current value if no diff
+func (o *Voice) GetSubKey() string {
+	if o.diff.SubKey != nil {
+		return *o.diff.SubKey
+	}
+	return o.SubKey
+}
+// GetSubKey. Diff method
+func (o voiceDiff) GetSubKey() *string { return o.SubKey }

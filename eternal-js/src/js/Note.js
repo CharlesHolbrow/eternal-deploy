@@ -1,19 +1,16 @@
+import Node from './Node.js';
+
 /**
  * Example object
  */
-export default class Note {
+export default class Note extends Node {
   /**
    * @param {string} key - provided by synk server
    * @param {object} state - initial state provided by synk server
    * @param {synk.Objects} synkObjects - this app's Objects
    */
   constructor(key, state, synkObjects) {
-    this.key = key;
-    this.element = document.createElement('div');
-    this.type = 'Note';
-    this.links = [null, null, null];
-
-    this.element.onclick = () => { synkObjects.emit('click', this); };
+    super(key, state, synkObjects);
 
     // Set any additional properties provided by the 'state' argument
     this.update(state);
@@ -23,19 +20,11 @@ export default class Note {
    * @param {object} state - diff passed by the synk server
    */
   update(state) {
+    super.update(state);
+
     if (state.hasOwnProperty('text')) {
       this.text = state.text;
       delete state.text;
-    }
-
-    if (state.hasOwnProperty('links')) {
-      this.links = state.links;
-      delete state.links;
-    }
-
-    if (state.hasOwnProperty('linksDiff')) {
-      Object.assign(this.links, state.linksDiff);
-      delete state.linksDiff;
     }
 
     Object.assign(this, this.state);
@@ -54,10 +43,4 @@ export default class Note {
   get text() {
     return this.element.textContent;
   }
-
-  /**
-   * Called when this object leaves our subscription area, or is removed from
-   * the synk server.
-   */
-  teardown() {}
 }

@@ -34,6 +34,7 @@ func main() {
 		voice := &eternal.Voice{
 			SubKey: subKey,
 		}
+		voice.SetLinksElement(0, "n:eternal|main")
 		length := 4 // how many beats long
 		for i := 0; i < length; i++ {
 			voice.Lengths[i] = 1
@@ -104,21 +105,37 @@ func main() {
 				synkConn.Modify(v)
 			}
 		case msg := <-fromRedis:
-			if parent, ok := part.Notes[msg.Parent]; !ok {
-				fmt.Println("Parent Not Found:", parent)
-			} else {
-				newNote := &eternal.Note{}
-				newNote.SetSubKey(parent.GetSubKey())
-				newNote.SetID(synk.NewID().String())
-				newNote.SetText(msg.Text)
+			var parent synk.Object
+			var addLinkErr error
 
-				if err := parent.AddLink(newNote.Key()); err != nil {
-					fmt.Println("Error Adding link to parent:", err)
-				} else {
-					synkConn.Modify(parent)
-					synkConn.Create(newNote)
-				}
+			newID := synk.NewID().String()
+			newNote := &eternal.Note{}
+			newNote.SetID(newID)
+			newNote.SetText(msg.Text)
+
+			if noteParent, ok := part.Notes[msg.Parent]; ok {
+				addLinkErr = noteParent.AddLink(newNote.Key())
+				parent = noteParent
+			} else if voiceParent, ok := part.Voices[msg.Parent]; ok {
+				addLinkErr = voiceParent.AddLink(newNote.Key())
+				parent = voiceParent
+			} else {
+				fmt.Println("Parent Not Found:", parent)
+				continue
 			}
+
+			if addLinkErr != nil {
+				fmt.Println("Error Adding link to parent:", addLinkErr)
+			}
+
+			// The client did not pass a subscription key -- instead, get it
+			// from the parent.
+			newNote.SetSubKey(parent.GetSubKey())
+
+			synkConn.Modify(parent)
+			synkConn.Create(newNote)
+			part.Notes[newNote.Key()] = newNote
+
 			fmt.Printf("Got Msg %v\n", msg)
 		}
 	}

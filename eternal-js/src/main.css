@@ -4,6 +4,22 @@ html {
   /* Prevent us from being able to scroll past the end of
   the page */
   /* overflow: hidden; */
+  min-height: 100%;
+
+}
+body {
+  /* margin: 0; */
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  /* font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; */
+  font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  /* background-color: black; */
+  /* color: white; */
+  /* filter: drop-shadow(8px 8px 10px red); */
+  /* filter: blur(2px); */
 }
 
 .focus {
@@ -14,7 +30,37 @@ html {
   background-color: rgb(255, 162, 162);
 }
 
-
-div#pool div {
+.eternal-node {
+  margin: 0;
+  width: 360px;
+  margin-left: -180px;
+  transition: transform 2s, top 2s, left 2s;
   text-align: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.focus {
+  top: 30%;
+  left: 50%;
+}
+.l0 {
+  top: 50%;
+  left: 25%;
+}
+.l1 {
+  top: 50%;
+  left: 50%;
+}
+.l2 {
+  top: 50%;
+  left: 75%;
+}
+
+div#pool {
+  /* Non 'static' position allows us to place children relative to this div */
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }

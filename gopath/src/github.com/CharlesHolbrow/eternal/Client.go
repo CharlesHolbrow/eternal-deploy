@@ -2,6 +2,7 @@ package eternal
 
 import (
 	"encoding/json"
+	"html"
 	"log"
 
 	"github.com/CharlesHolbrow/synk"
@@ -22,6 +23,7 @@ func (cc Client) OnMessage(client *synk.Client, method string, data []byte) {
 	if method == "addNote" {
 		anr := &AddNoteRequest{}
 		if err := json.Unmarshal(data, anr); err == nil {
+			anr.Text = html.EscapeString(anr.Text)
 			if sendMe, err := json.Marshal(anr); err != nil {
 				log.Println("Faile to re-marshall JSON from client:", err.Error())
 			} else {
@@ -30,7 +32,6 @@ func (cc Client) OnMessage(client *synk.Client, method string, data []byte) {
 		} else {
 			log.Println("Error handling addNoteRequest:", err.Error())
 		}
-
 	}
 }
 
