@@ -42,21 +42,15 @@ body {
 }
 
 .focus {
-  top: 30%;
+  top: 10%;
   left: 50%;
 }
-.l0 {
-  top: 50%;
-  left: 25%;
-}
-.l1 {
-  top: 50%;
-  left: 50%;
-}
-.l2 {
-  top: 50%;
-  left: 75%;
-}
+
+.link { top: 30%; }
+
+.l0 { left: 25%; }
+.l1 { left: 50%; }
+.l2 { left: 75%; }
 
 div#pool {
   /* Non 'static' position allows us to place children relative to this div */

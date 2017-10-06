@@ -10,6 +10,7 @@ export default class Node {
     this.links = [null, null, null];
     this.element = document.createElement('div');
     this.element.classList.add('eternal-node');
+    this.element.id = key;
     this.synkObjects = synkObjects;
   }
 
@@ -33,36 +34,4 @@ export default class Node {
    * the synk server.
    */
   teardown() {}
-
-  setRandomPosition() {
-    const angle = Math.random() * 2 * Math.PI; // 0 to 2pi
-    let x = Math.cos(angle);
-    let y = Math.sin(angle);
-
-    // We have x and y between -1 and 1 with origin 0
-
-    // first scale for nice distance from the center
-    const min = 0.25; // minimum dist from center
-    const scale = 0.5; // Math.random();
-
-    x = x * Math.abs(Math.random() * (1 / x));
-    y = y * Math.abs(Math.random() * (1 / y));
-
-    // We want x and y between 0 and 100 with origin 50
-    x = (x + 1) * 50;
-    y = (y + 1) * 50;
-
-    this.element.style.left = `${x}%`;
-    this.element.style.top = `${y}%`;
-    throw new Error('setRandomPosition deprecated');
-  }
-
-  clearRandomPosition() {
-    this.element.style.left = '';
-    this.element.style.top = '';
-  }
-
-  updatePosition() {
-    this.synkObjects.emit('updatePosition', this);
-  }
 }
