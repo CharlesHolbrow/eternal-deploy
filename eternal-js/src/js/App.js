@@ -57,6 +57,18 @@ export default class App {
       if (obj.element && obj.key) this.focus(obj.key);
     });
 
+    this.synk.objects.on('updatePosition', (obj) => {
+      if (obj.element.classList.contains('link')
+      || obj.element.classList.contains('focus')) {
+        obj.clearRandomPosition();
+
+        return;
+      }
+      obj.element.style.top = '70%';
+      obj.element.style.left = `${Math.random() * 100}%`;
+
+    });
+
     // default focus object is hard-coded
     this.focus('n:eternal|main');
   }

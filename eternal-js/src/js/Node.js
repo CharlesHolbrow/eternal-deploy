@@ -10,6 +10,7 @@ export default class Node {
     this.links = [null, null, null];
     this.element = document.createElement('div');
     this.element.classList.add('eternal-node');
+    this.synkObjects = synkObjects;
   }
 
   /**
@@ -53,6 +54,7 @@ export default class Node {
 
     this.element.style.left = `${x}%`;
     this.element.style.top = `${y}%`;
+    throw new Error('setRandomPosition deprecated');
   }
 
   clearRandomPosition() {
@@ -61,10 +63,6 @@ export default class Node {
   }
 
   updatePosition() {
-    if (this.element.classList.contains('link')
-    || this.element.classList.contains('focus'))
-      this.clearRandomPosition();
-    else
-      this.setRandomPosition();
+    this.synkObjects.emit('updatePosition', this);
   }
 }
