@@ -43,6 +43,8 @@ export default class App {
 
     this.synk.objects.on('add', (obj) => {
       this.updateObject(obj);
+      this.updateObjectPosition(obj);
+      obj.element.classList.add('fade-in-fast');
     });
 
     this.synk.objects.on('rem', (obj) => {
@@ -94,8 +96,6 @@ export default class App {
         return;
       }
     }
-
-    // The object is known to be floating
   }
 
   /**

@@ -16,18 +16,10 @@ body {
   /* margin: 0; */
   /* font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; */
   font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-  /* background-color: black; */
-  /* color: white; */
+  background-color: black;
+  color: white;
   /* filter: drop-shadow(8px 8px 10px red); */
   /* filter: blur(2px); */
-}
-
-.focus {
-  background-color: rgba(162, 182, 255, 0.2);
-}
-
-.link {
-  background-color: rgba(255, 162, 162, 0.2);
 }
 
 .eternal-node {
@@ -68,8 +60,40 @@ div#pool div.eternal-node {
 
 div#pool span {
   pointer-events: auto;
+  cursor: pointer;
 }
 
 div#pool svg {
   pointer-events: visiblePainted;
+  cursor: pointer;
+}
+
+.fade-in-fast {
+  animation-name: fadeIn;
+  animation-duration: 2s;
+}
+
+body {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    filter: blur(3px);
+  }
+
+  75% {
+    opacity: 1;
+  }
+
+  100% {
+    filter: blur(0);
+  }
 }

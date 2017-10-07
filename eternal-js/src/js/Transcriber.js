@@ -27,12 +27,20 @@ export default class Transcriber {
    * @param {DomElement} element - The dom element were we add an .svg
    */
   constructor(element) {
-    // xPosition: 10, yPosition: 40, width: 400
-    this.stave = new VF.Stave(10, 40, 340);
     this.renderer = new VF.Renderer(element, VF.Renderer.Backends.SVG);
     this.renderer.resize(360, 180);
+    this.color = 'white';
+
+    // args are xPosition: 10, yPosition: 40, width: 340
+    // fill_style changes the color of the horizontal staff, but not the time signature
+    this.stave = new VF.Stave(10, 40, 340, { fill_style: this.color });
     this.stave.addClef('treble').addTimeSignature('4/4');
     this.stave.setContext(this.renderer.getContext());
+
+    // All this just to get the color of the clef and time sig correct
+    // on the first render.
+    this.setNotes([0], [1]);
+    this.renderer.getContext().clear();
   }
 
   /**
@@ -53,23 +61,24 @@ export default class Transcriber {
       const noteNum = noteNums[i];
 
       if (beats <= 0) break;
-      const duration = floatToVexflowDuration(beats);
-
       totalBeats += beats;
-      notes.push(
-        new VF.StaveNote({
-          duration,
-          clef: 'treble',
-          keys: [`${whiteNotes[noteNum % 7]}/4`],
-        }),
-      );
+
+      const duration = floatToVexflowDuration(beats);
+      const note = new VF.StaveNote({
+        duration,
+        clef: 'treble',
+        keys: [`${whiteNotes[noteNum % 7]}/4`],
+      });
+
+      note.setStyle({ fillStyle: this.color, strokeStyle: this.color });
+      notes.push(note);
     }
 
     // Voice represents a sequence of notes
     this.voice = new VF.Voice({ num_beats: totalBeats, beat_value: 4 });
     this.voice.addTickables(notes);
 
-    // Format and justify the notes to 400 pixels.
+    // Format and justify the notes to 320 pixels.
     const formatter = new VF.Formatter().joinVoices([this.voice]).format([this.voice], 320);
 
     this.voice.draw(this.renderer.getContext(), this.stave);
