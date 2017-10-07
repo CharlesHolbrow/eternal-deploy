@@ -40,6 +40,8 @@ export default class App {
     });
 
     this.pool = document.getElementById('pool');
+    this.linksDiv = document.getElementById('links');
+    this.focusDiv = document.getElementById('focus');
 
     this.synk.objects.on('add', (obj) => {
       this.updateObject(obj);
@@ -148,33 +150,6 @@ export default class App {
   }
 
   /**
-   * Set the 'link' 'l0' 'l1' 'l2' and html classes to the appropriate objects
-   *
-   * each of the l0 l1 l2 classes should be on zero or more elements
-   * link should be on zero to three elements
-   */
-  updateLinks() {
-    if (!this.focusObject || !this.focusObject.links) {
-      for (const object of this.linkObjects) {
-        if (object) {
-          object.element.classList.remove('link', 'l0', 'l1', 'l2');
-          this.updateObjectPosition(object);
-        }
-      }
-
-      this.linkObjects = [null, null, null];
-
-      return;
-    }
-
-    if (!this.focusObject.links) return;
-
-    this.focusObject.links.forEach((key, index) => {
-      this.setLink(key, index);
-    });
-  }
-
-  /**
    * Set a linked object. Remove old link if any
    * 
    * @param {String} objectKey - the key of the object to set
@@ -214,14 +189,18 @@ export default class App {
    * @param {Object} obj - synk object with .element
    */
   updateObjectPosition(obj) {
-    if (obj.element.classList.contains('link')
-    || obj.element.classList.contains('focus')) {
-      obj.element.style.top = null;
-      obj.element.style.left = null;
+    if (obj.element.classList.contains('link')) {
+      this.linksDiv.appendChild(obj.element);
 
       return;
     }
-    obj.element.style.top = `${(Math.random() * 30) + 60}%`;
-    obj.element.style.left = `${Math.random() * 100}%`;
+
+    if (obj.element.classList.contains('focus')) {
+      this.focusDiv.appendChild(obj.element);
+
+      return;
+    }
+
+    this.pool.appendChild(obj.element);
   }
 }
