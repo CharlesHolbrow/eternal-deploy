@@ -39,7 +39,8 @@ export default class App {
       console.log('connection open bySKey.branches: ', Object.keys(this.synk.objects.bySKey.branches));
     });
 
-    this.pool = document.getElementById('pool');
+    this.pool = document.createElement('div');
+    this.pool.id = 'pool';
     this.linksDiv = document.getElementById('links');
     this.focusDiv = document.getElementById('focus');
 
@@ -78,9 +79,6 @@ export default class App {
    * @param {Object} object - the synk object to inspect
    */
   updateObject(object) {
-    if (object.element.parentElement !== this.pool)
-      this.pool.appendChild(object.element);
-
     // first check if the object is the focus object
     if (object.key === this.focusKey) {
       this.focusOnObject(object);
@@ -98,6 +96,9 @@ export default class App {
         return;
       }
     }
+
+    if (object.element.parentElement !== this.pool)
+      this.pool.appendChild(object.element);
   }
 
   /**
@@ -127,7 +128,8 @@ export default class App {
       return;
     }
 
-    if (this.focusObject && this.focusObject.element) {
+    // Do we need to remove the old object?
+    if (this.focusObject && this.focusObject.element && object !== this.focusObject) {
       this.focusObject.element.classList.remove('focus');
       this.updateObjectPosition(this.focusObject);
     }
@@ -169,6 +171,10 @@ export default class App {
       return;
     }
 
+    // The link may already be correct. If so, no change is needed
+    if (currentObject && currentObject.key === objectKey)
+      return;
+
     // we are trying to find a new object
     if (currentObject) {
       currentObject.element.classList.remove('link', lClass);
@@ -190,13 +196,16 @@ export default class App {
    */
   updateObjectPosition(obj) {
     if (obj.element.classList.contains('link')) {
-      this.linksDiv.appendChild(obj.element);
+      // call .appendChild only if necessary - prevent re-triggering css transitions
+      if (obj.element.parentElement !== this.linksDiv)
+        this.linksDiv.appendChild(obj.element);
 
       return;
     }
 
     if (obj.element.classList.contains('focus')) {
-      this.focusDiv.appendChild(obj.element);
+      if (obj.element.parentElement !== this.focusDiv)
+        this.focusDiv.appendChild(obj.element);
 
       return;
     }

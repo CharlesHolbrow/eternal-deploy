@@ -9,12 +9,14 @@ body {
 
 #focus {
   display: flex;
+  align-items: center;
   justify-content: space-around;
   min-height: 200px;
 }
 
 #links {
   display: flex;
+  align-items: center;
   justify-content: space-around;
   flex-wrap: wrap;
   min-height: 200px
@@ -25,32 +27,22 @@ body {
   min-width: 100px;
   transition: transform 1.5s, top 1.5s, left 1.5s;
   text-align: center;
-  top: 0;
-  left: 0;
 }
-
-.focus {
-  top: 10%;
-  left: 50%;
-}
-
-
 
 .l0 { order: 2; }
 .l1 { order: 1; }
 .l2 { order: 3; }
 
-
-div#pool div.eternal-node {
-  pointer-events: none;
+#focus .eternal-node span, #focus .eternal-node svg {
+  cursor: default;
 }
 
-div#pool span {
+#links .eternal-node span {
   pointer-events: auto;
   cursor: pointer;
 }
 
-div#pool svg {
+#links .eternal-node svg {
   pointer-events: visiblePainted;
   cursor: pointer;
 }
