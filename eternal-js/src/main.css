@@ -12,6 +12,7 @@ body {
   align-items: center;
   justify-content: space-around;
   min-height: 200px;
+  font-size: 135%;
 }
 
 #links {
