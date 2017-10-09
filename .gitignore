@@ -9,6 +9,7 @@ gopath/src/github.com/CharlesHolbrow/*
 !gopath/src/github.com/CharlesHolbrow/eternal
 !gopath/src/github.com/CharlesHolbrow/eternal-http
 !gopath/src/github.com/CharlesHolbrow/eternal-action
+!gopath/src/github.com/CharlesHolbrow/eternal-init
 .vscode/
 certbot/
 nginx/nginx.conf

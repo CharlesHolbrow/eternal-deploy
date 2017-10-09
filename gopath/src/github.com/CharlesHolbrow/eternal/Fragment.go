@@ -40,6 +40,18 @@ func (frag *Fragment) HasNote(n *Note) bool {
 	return ok && fragNote == n
 }
 
+// Clear deletes all content from the fragment.
+func (frag *Fragment) Clear() {
+	for key, voice := range frag.Voices {
+		frag.synkConn.Delete(voice)
+		delete(frag.Voices, key)
+	}
+	for key, note := range frag.Notes {
+		frag.synkConn.Delete(note)
+		delete(frag.Notes, key)
+	}
+}
+
 // AddNote to the Fragment.
 // - The note's subscription key will be set
 // - The note will be given an ID if it does not have one
@@ -56,6 +68,25 @@ func (frag *Fragment) AddNote(n *Note) error {
 
 	n.SetSubKey(frag.sKey)
 	frag.synkConn.Create(n)
+	return nil
+}
+
+// AddVoice to the Fragment.
+// - The voice's subscription key will be set
+// - The voice will be given an ID if it does not have one
+func (frag *Fragment) AddVoice(v *Voice) error {
+	// Ensure that the new Note has a subscription key and ID
+	v.SetID(synk.NewID().String())
+
+	// verify that the note isn't already in the fragment
+	if _, ok := frag.Voices[v.Key()]; ok {
+		return fmt.Errorf("Voice Already in Fragment: %s", v.Key())
+	}
+
+	frag.Voices[v.Key()] = v
+
+	v.SetSubKey(frag.sKey)
+	frag.synkConn.Create(v)
 	return nil
 }
 

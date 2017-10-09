@@ -4,10 +4,10 @@ HOST?=eternal.media.mit.edu
 HTTPS_REDIRECT?=$(HOST)
 
 PWD := $(shell pwd)
-GOPATH := $(PWD)/gopath
+export GOPATH := $(PWD)/gopath
 GOCODE := $(GOPATH)/src/github.com/CharlesHolbrow
 PUBLIC_DIR := ./public
-ETERNAL_SOURCES := $(shell find $(GOCODE)/eternal $(GOCODE)/eternal-http $(GOCODE)/synk $(GOCODE)/eternal-action -name \*.go)
+ETERNAL_SOURCES := $(shell find $(GOCODE)/eternal $(GOCODE)/eternal-http $(GOCODE)/synk $(GOCODE)/eternal-action $(GOCODE)/eternal-init -name \*.go)
 
 
 .PHONY: dev-client prod-client dev-certificate prod-certificate eternal-http eternal-action nginx-install services pagen default
@@ -15,14 +15,16 @@ ETERNAL_SOURCES := $(shell find $(GOCODE)/eternal $(GOCODE)/eternal-http $(GOCOD
 default: eternal-action eternal-http
 eternal-http: $(GOPATH)/bin/eternal-http
 eternal-action: $(GOPATH)/bin/eternal-action
+eternal-init: $(GOPATH)/bin/eternal-init
 
 # The /bin targets below could be made with a pattern rule. However, I found
 # pattern rules harder to maintain in the long term, so I'm going to KISS
 $(GOPATH)/bin/eternal-http: $(ETERNAL_SOURCES)
-	cd $(GOCODE)/eternal-http; GOPATH=$(GOPATH); go get && go install
-
+	cd $(GOCODE)/eternal-http; go get && go install
 $(GOPATH)/bin/eternal-action: $(ETERNAL_SOURCES)
-	cd $(GOCODE)/eternal-action; GOPATH=$(GOPATH); go get && go install
+	cd $(GOCODE)/eternal-action; go get && go install
+$(GOPATH)/bin/eternal-init: $(ETERNAL_SOURCES)
+	cd $(GOCODE)/eternal-init; go get && go install
 
 # This is designed to run in production.
 #
