@@ -2,17 +2,21 @@
 import Emitter from 'eventemitter3';
 import Kefir from 'kefir';
 import { Flow as VF } from 'vexflow';
+import help from 'midi-help';
 
 // Local
 import App from './App.js';
+import MIDI from './MIDI.js';
 
 // Libs
 window.Kefir = Kefir;
 window.Emitter = Emitter;
 window.VF = VF;
+window.help = help;
 
 // Aether Libs
 window.App = App;
+window.MIDI = MIDI;
 
 window.onload = () => {
   const app = window.app = new App();
