@@ -3,6 +3,8 @@ import { Objects, Connection, Synk }  from 'synk-js';
 import AppEndpoint from './AppEndpoint.js';
 import Note from './Note.js';
 import Voice from './Voice.js';
+import MIDI from './MIDI.js';
+import ChordLibrary from './ChordLibrary.js';
 
 /**
 * High level Aether Application
@@ -19,8 +21,13 @@ export default class App {
     this.focusObject = null;
     this.linkObjects = [null, null, null];
 
+    this.MIDI = new MIDI('IAC');
     this.synk = new Synk(url);
     this.endpoint = new AppEndpoint(this);
+
+    // Chord library makes it easy to send midi!
+    this.chordLibrary = new ChordLibrary();
+    this.chordLibrary.pushAnthem();
 
     // All messages from the server will be passed to the endpoint. Thanks to
     // the connection object, even if we disconnect and reconnect, incoming
