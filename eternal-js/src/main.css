@@ -25,6 +25,7 @@ body {
 
 .next {
   box-shadow: 0px 0px 10px white;
+  border-radius: 10px;
 }
 
 .eternal-node {
@@ -42,6 +43,11 @@ body {
   cursor: default;
 }
 
+.eternal-node span {
+  display: inline-block; /* margin doesn't work on inline elements */
+  margin: 12px;
+}
+
 #links .eternal-node span {
   pointer-events: auto;
   cursor: pointer;
@@ -52,9 +58,16 @@ body {
   cursor: pointer;
 }
 
-.fade-in-fast {
+.fade-in {
   animation-name: fadeIn;
   animation-duration: 2s;
+}
+
+hr {
+  border: 0;
+  height: 2px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(255, 255, 255, 1), rgba(0, 0, 0, 0));
+  transition-timing-function: ease-out;
 }
 
 body {

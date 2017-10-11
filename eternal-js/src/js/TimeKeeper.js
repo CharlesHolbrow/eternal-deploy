@@ -2,14 +2,14 @@ import Emitter from 'eventemitter3';
 
 export default class TimeKeeper {
   /**
+   * @param {[number]} bpm - beats per minute to tick at. default = 60
    * @param {function} callback - called every time increment. Will be called with:
    *        - integer beat index.
    *        - floating point beatTime - precise time of next beat.
    *          approximately this.delay ms from now
    *        - floating point duration - duration of one beat
-   * @param {[number]} bpm - beats per minute to tick at. default = 60
    */
-  constructor(callback, bpm) {
+  constructor(bpm, callback) {
     if (!window.performance) {
       console.error('Cannot keep time! missing window.performance');
 

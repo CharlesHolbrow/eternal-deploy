@@ -34,14 +34,29 @@ export default class App {
     // Give Transcriber's access to the chordLibrary
     this.synk.objects.chordLibrary = this.chordLibrary;
 
+    this.pool = document.createElement('div');
+    this.pool.id = 'pool';
+    this.linksDiv = document.getElementById('links');
+    this.focusDiv = document.getElementById('focus');
+    this.hr = document.getElementById('beat');
+
     // Time Keeper helps us keep accurate time in spite of the jittery js event loop
-    this.timeKeeper = new TimeKeeper((i, beatTime, duration) => {
+    const bpm = 26;
+
+    this.timeKeeper = new TimeKeeper(bpm, (i, beatTime, duration) => {
       this.midi.send(help.noteOn(39, 100, 9), beatTime);
       this.midi.send(help.noteOn(39, 0, 9), beatTime + 100);
       this.midi.send(help.noteOn(39, 50, 9), beatTime + (duration / 2));
       this.midi.send(help.noteOn(39, 0, 9), beatTime + (duration / 2) + 100);
 
-      if (!(i % 2)) { // every other hacky
+      this.hr.style.transition = '';
+      this.hr.style.opacity = '0';
+      setTimeout(() => {
+        this.hr.style.transition = `opacity ${Math.floor(duration)}ms`;
+        this.hr.style.opacity = '1';
+      }, 100);
+
+      if (!(i % 2)) { // every other tick (hacky)
         if (this.nextObject && this.nextObject.element && this.nextObject.key) {
           this.focus(this.nextObject.key);
           if (this.nextObject.transcriber) {
@@ -57,9 +72,7 @@ export default class App {
           this.clearNext();
         }
       }
-
     });
-    this.timeKeeper.bpm = 30;
 
     // All messages from the server will be passed to the endpoint. Thanks to
     // the connection object, even if we disconnect and reconnect, incoming
@@ -78,15 +91,10 @@ export default class App {
       console.log('connection open bySKey.branches: ', Object.keys(this.synk.objects.bySKey.branches));
     });
 
-    this.pool = document.createElement('div');
-    this.pool.id = 'pool';
-    this.linksDiv = document.getElementById('links');
-    this.focusDiv = document.getElementById('focus');
-
     this.synk.objects.on('add', (obj) => {
       this.updateObject(obj);
       this.updateObjectPosition(obj);
-      obj.element.classList.add('fade-in-fast');
+      obj.element.classList.add('fade-in');
     });
 
     this.synk.objects.on('rem', (obj) => {
