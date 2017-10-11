@@ -41,13 +41,17 @@ export default class App {
     this.hr = document.getElementById('beat');
 
     // Time Keeper helps us keep accurate time in spite of the jittery js event loop
-    const bpm = 26;
+    const bpm = 10;
 
     this.timeKeeper = new TimeKeeper(bpm, (i, beatTime, duration) => {
       this.midi.send(help.noteOn(39, 100, 9), beatTime);
       this.midi.send(help.noteOn(39, 0, 9), beatTime + 100);
-      this.midi.send(help.noteOn(39, 50, 9), beatTime + (duration / 2));
+      this.midi.send(help.noteOn(39, 50, 9), beatTime + (duration / 4));
+      this.midi.send(help.noteOn(39, 0, 9), beatTime + (duration / 4) + 100);
+      this.midi.send(help.noteOn(39, 84, 9), beatTime + (duration / 2));
       this.midi.send(help.noteOn(39, 0, 9), beatTime + (duration / 2) + 100);
+      this.midi.send(help.noteOn(39, 45, 9), beatTime + (duration / 4 * 3));
+      this.midi.send(help.noteOn(39, 0, 9), beatTime + (duration / 4 * 3) + 100);
 
       this.hr.style.transition = '';
       this.hr.style.opacity = '0';
@@ -56,21 +60,19 @@ export default class App {
         this.hr.style.opacity = '1';
       }, 100);
 
-      if (!(i % 2)) { // every other tick (hacky)
-        if (this.nextObject && this.nextObject.element && this.nextObject.key) {
-          this.focus(this.nextObject.key);
-          if (this.nextObject.transcriber) {
-            const chord = this.nextObject.chordLibrary.chords[this.nextObject.notes[0]];
+      if (this.nextObject && this.nextObject.element && this.nextObject.key) {
+        this.focus(this.nextObject.key);
+        if (this.nextObject.transcriber) {
+          const chord = this.nextObject.chordLibrary.chords[this.nextObject.notes[0]];
 
-            console.log('chord:', chord);
+          console.log('chord:', chord);
 
-            for (const noteNum of chord.midiNotes) {
-              this.midi.send(help.noteOn(noteNum, 100, 0), beatTime);
-              this.midi.send(help.noteOn(noteNum, 0, 0), beatTime + (duration * 2) - 5); // beatTime + duration * 2 will cause problems if we speed up the tempo
-            }
+          for (const noteNum of chord.midiNotes) {
+            this.midi.send(help.noteOn(noteNum, 100, 0), beatTime);
+            this.midi.send(help.noteOn(noteNum, 0, 0), beatTime + duration - 5); // beatTime + duration * 2 will cause problems if we speed up the tempo
           }
-          this.clearNext();
         }
+        this.clearNext();
       }
     });
 

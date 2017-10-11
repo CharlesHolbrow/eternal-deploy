@@ -42,22 +42,49 @@ func main() {
 	}
 	whatFor.SetID("whatfor")
 	initial.AddLink(whatFor.Key())
+	initial.Resolve()
 
-	// Add a voice
-	voice := &eternal.Voice{
-		SubKey: subKey,
+	// voices
+	numVoices := 7
+	voices := make([]*eternal.Voice, 0, numVoices)
+	for i := 0; i < 7; i++ {
+		voice := &eternal.Voice{
+			SubKey: subKey,
+		}
+		voices = append(voices, voice)
+		voice.SetID(fmt.Sprintf("voiceinit%d", i))
+
+		if i == 0 {
+			whatFor.AddLink(voice.Key())
+			whatFor.Resolve()
+		}
+
+		if i > 0 {
+			voices[i-1].AddLink(voice.Key())
+			voices[i-1].Resolve()
+			voice.AddLink(voices[i-1].Key())
+			voice.Resolve()
+		}
+
+		if i == numVoices-1 {
+			voice.AddLink("n:eternal|main")
+			voice.Resolve()
+			voice.AddLink(voices[0].Key())
+			voice.Resolve()
+		}
+
+		voice.Lengths[0] = 4
+		voice.Notes[0] = i % 8
+		// Note the bug in AddLink . We myst resolve after adding
 	}
-	voice.SetLinksElement(0, "n:eternal|main")
-	voice.SetID("voiceinit")
-	length := 4 // how many beats long
-	for i := 0; i < length; i++ {
-		voice.Lengths[i] = 1
+
+	fmt.Println("Adding voices:")
+	for _, voice := range voices {
+		part.AddVoice(voice)
 	}
-	whatFor.AddLink(voice.Key())
 
 	// Create the root object in Redis
 	fmt.Println("Created initial values...")
-	fmt.Println("part.AddVoice:", part.AddVoice(voice))
 	fmt.Println("Add Neil Quote error:", part.AddNote(initial))
 	fmt.Println("Add What For error:", part.AddNote(whatFor))
 
