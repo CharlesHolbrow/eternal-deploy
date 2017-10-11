@@ -25,8 +25,11 @@ for (let i = 0; i < 128; i++){
 export default class Transcriber {
   /**
    * @param {DomElement} element - The dom element were we add an .svg
+   * @param {ChordLibrary} chordLib - Incoming note numbers will refer to chords
+   *        here.
    */
-  constructor(element) {
+  constructor(element, chordLib) {
+    this.chordLibrary = chordLib;
     this.renderer = new VF.Renderer(element, VF.Renderer.Backends.SVG);
     this.renderer.resize(360, 180);
     this.color = 'white';
@@ -36,6 +39,7 @@ export default class Transcriber {
     this.stave = new VF.Stave(10, 40, 340, { fill_style: this.color });
     this.stave.addClef('treble').addTimeSignature('4/4');
     this.stave.setContext(this.renderer.getContext());
+    this.stave.setKeySignature('Cm');
 
     // All this just to get the color of the clef and time sig correct
     // on the first render.
@@ -67,7 +71,7 @@ export default class Transcriber {
       const note = new VF.StaveNote({
         duration,
         clef: 'treble',
-        keys: [`${whiteNotes[noteNum % 7]}/4`],
+        keys: this.chordLibrary.chords[noteNum].vfPitches,
       });
 
       note.setStyle({ fillStyle: this.color, strokeStyle: this.color });
@@ -79,7 +83,7 @@ export default class Transcriber {
     this.voice.addTickables(notes);
 
     // Format and justify the notes to 320 pixels.
-    const formatter = new VF.Formatter().joinVoices([this.voice]).format([this.voice], 320);
+    const formatter = new VF.Formatter().joinVoices([this.voice]).format([this.voice], 270);
 
     this.voice.draw(this.renderer.getContext(), this.stave);
   }

@@ -14,7 +14,7 @@ export default class Voice extends Node {
     super(key, state, synkObjects);
 
     this.element.onclick = () => { synkObjects.emit('click', this); };
-    this.transcriber = new Transcriber(this.element);
+    this.transcriber = new Transcriber(this.element, synkObjects.chordLibrary);
     this.type = 'voice';
 
     // Set any additional properties provided by the 'state' argument

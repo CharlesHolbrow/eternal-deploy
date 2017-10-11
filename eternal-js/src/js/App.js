@@ -1,10 +1,12 @@
 import { Objects, Connection, Synk }  from 'synk-js';
+import help from 'midi-help';
 
 import AppEndpoint from './AppEndpoint.js';
 import Note from './Note.js';
 import Voice from './Voice.js';
 import MIDI from './MIDI.js';
 import ChordLibrary from './ChordLibrary.js';
+import TimeKeeper from './TimeKeeper.js';
 
 /**
 * High level Aether Application
@@ -21,13 +23,23 @@ export default class App {
     this.focusObject = null;
     this.linkObjects = [null, null, null];
 
-    this.MIDI = new MIDI('IAC');
+    this.midi = new MIDI('IAC');
     this.synk = new Synk(url);
     this.endpoint = new AppEndpoint(this);
 
     // Chord library makes it easy to send midi!
     this.chordLibrary = new ChordLibrary();
     this.chordLibrary.pushAnthem();
+    // Give Transcriber's access to the chordLibrary
+    this.synk.objects.chordLibrary = this.chordLibrary;
+
+    // Time Keeper helps us keep accurate time in spite of the jittery js event loop
+    this.timeKeeper = new TimeKeeper((i, beatTime, duration) => {
+      this.midi.output.send(help.noteOn(39, 100, 9), beatTime);
+      this.midi.output.send(help.noteOn(39, 0, 9), beatTime + 100);
+      this.midi.output.send(help.noteOn(39, 50, 9), beatTime + (duration / 2));
+      this.midi.output.send(help.noteOn(39, 0, 9), beatTime + (duration / 2) + 100);
+    }, 30);
 
     // All messages from the server will be passed to the endpoint. Thanks to
     // the connection object, even if we disconnect and reconnect, incoming

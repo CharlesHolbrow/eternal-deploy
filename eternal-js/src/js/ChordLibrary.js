@@ -131,13 +131,14 @@ export default class ChordLibrary {
    */
   pushAnthem() {
     const chords = [
-      new Chord('Cm7', openMinor7MIDI(48, true, true), []),
-      new Chord('Dm7#5', openMinor7Sharp5MIDI(50, true, true), []),
-      new Chord('EbMaj7', openMajor7MIDI(51, true, true), []),
-      new Chord('Fm7', openMinor7MIDI(53, true, true), []),
-      new Chord('Gm7', openMinor7MIDI(55, true, true), []),
-      new Chord('AbMaj7', openMajor7MIDI(56, true, true), []),
-      new Chord('Bb7', open7MIDI(58, true, true), []),
+      new Chord('Cm7', openMinor7MIDI(48, true, true), ['c/4', 'g/4', 'b/4', 'e/5']),
+      new Chord('Dm7#5', openMinor7Sharp5MIDI(50, true, true), ['d/4', 'b/4', 'c/5', 'f/5']),
+      new Chord('EbMaj7', openMajor7MIDI(51, true, true), ['e/4', 'b/4', 'd/5', 'g/5']),
+      new Chord('Fm7', openMinor7MIDI(53, true, true), ['f/4', 'c/5', 'e/5', 'a/5']),
+      new Chord('Gm7', openMinor7MIDI(55, true, true), ['g/4', 'd/5', 'f/5', 'a/5']),
+      new Chord('AbMaj7', openMajor7MIDI(56, true, true), ['a/4', 'e/5', 'g/5', 'c/6']),
+      new Chord('Bb7', open7MIDI(58, true, true), ['b/4', 'f/5', 'a/5', 'd/6']),
+      new Chord('Cm7+8va', openMinor7MIDI(60, true, true), ['c/5', 'g/5', 'b/5', 'e/6']),
     ];
 
     for (const chord of chords) this.push(chord);
