@@ -44,10 +44,32 @@ func main() {
 	initial.AddLink(whatFor.Key())
 	initial.Resolve()
 
+	model := &eternal.Note{
+		Text: "A new experimental model for how to communicate on the web",
+		ID:   "model",
+	}
+	whatFor.AddLink(model.Key())
+	whatFor.Resolve()
+
+	rationalize := &eternal.Note{
+		Text: "An introspection into how we rationalize our emotions",
+		ID:   "rationalize",
+	}
+	part.AddNote(rationalize)
+	whatFor.AddLink(rationalize.Key())
+	whatFor.Resolve()
+
+	music := &eternal.Note{
+		Text: "A collaborative musical composition",
+		ID:   "music",
+	}
+	whatFor.AddLink(music.Key())
+	whatFor.Resolve()
+
 	// voices
-	numVoices := 7
+	numVoices := 8
 	voices := make([]*eternal.Voice, 0, numVoices)
-	for i := 0; i < 7; i++ {
+	for i := 0; i < numVoices; i++ {
 		voice := &eternal.Voice{
 			SubKey: subKey,
 		}
@@ -55,8 +77,8 @@ func main() {
 		voice.SetID(fmt.Sprintf("voiceinit%d", i))
 
 		if i == 0 {
-			whatFor.AddLink(voice.Key())
-			whatFor.Resolve()
+			music.AddLink(voice.Key())
+			music.Resolve()
 		}
 
 		if i > 0 {
@@ -85,6 +107,11 @@ func main() {
 
 	// Create the root object in Redis
 	fmt.Println("Created initial values...")
+
+	part.AddNote(model)
+	part.AddNote(rationalize)
+	part.AddNote(music)
+
 	fmt.Println("Add Neil Quote error:", part.AddNote(initial))
 	fmt.Println("Add What For error:", part.AddNote(whatFor))
 

@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"os"
 	"time"
 
@@ -65,10 +64,6 @@ func main() {
 	for {
 		select {
 		case <-ticker.C:
-			for _, v := range part.Voices {
-				v.SetNotesElement(rand.Intn(4), rand.Intn(7))
-				synkConn.Modify(v)
-			}
 		case msg := <-fromRedis:
 			var parent synk.Object
 			var addLinkErr error
