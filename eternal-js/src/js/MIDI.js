@@ -51,4 +51,8 @@ export default class MIDI extends Emitter {
       this.emit('error', this.error);
     }
   }
+
+  send(value, time) {
+    if (this.output && !this.error) this.output.send(value, time);
+  }
 }

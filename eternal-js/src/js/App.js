@@ -22,6 +22,7 @@ export default class App {
     this.focusKey = null;
     this.focusObject = null;
     this.linkObjects = [null, null, null];
+    this.nextObject = null;
 
     this.midi = new MIDI('IAC');
     this.synk = new Synk(url);
@@ -35,11 +36,30 @@ export default class App {
 
     // Time Keeper helps us keep accurate time in spite of the jittery js event loop
     this.timeKeeper = new TimeKeeper((i, beatTime, duration) => {
-      this.midi.output.send(help.noteOn(39, 100, 9), beatTime);
-      this.midi.output.send(help.noteOn(39, 0, 9), beatTime + 100);
-      this.midi.output.send(help.noteOn(39, 50, 9), beatTime + (duration / 2));
-      this.midi.output.send(help.noteOn(39, 0, 9), beatTime + (duration / 2) + 100);
-    }, 30);
+      this.midi.send(help.noteOn(39, 100, 9), beatTime);
+      this.midi.send(help.noteOn(39, 0, 9), beatTime + 100);
+      this.midi.send(help.noteOn(39, 50, 9), beatTime + (duration / 2));
+      this.midi.send(help.noteOn(39, 0, 9), beatTime + (duration / 2) + 100);
+
+      if (!(i % 2)) { // every other hacky
+        if (this.nextObject && this.nextObject.element && this.nextObject.key) {
+          this.focus(this.nextObject.key);
+          if (this.nextObject.transcriber) {
+            const chord = this.nextObject.chordLibrary.chords[this.nextObject.notes[0]];
+
+            console.log('chord:', chord);
+
+            for (const noteNum of chord.midiNotes) {
+              this.midi.send(help.noteOn(noteNum, 100, 0), beatTime);
+              this.midi.send(help.noteOn(noteNum, 0, 0), beatTime + (duration * 2) - 5); // beatTime + duration * 2 will cause problems if we speed up the tempo
+            }
+          }
+          this.clearNext();
+        }
+      }
+
+    });
+    this.timeKeeper.bpm = 30;
 
     // All messages from the server will be passed to the endpoint. Thanks to
     // the connection object, even if we disconnect and reconnect, incoming
@@ -82,7 +102,8 @@ export default class App {
     });
 
     this.synk.objects.on('click', (obj) => {
-      if (obj.element && obj.key) this.focus(obj.key);
+      // if (obj.element && obj.key) this.focus(obj.key);
+      this.setNext(obj);
     });
 
     this.synk.objects.on('updatePosition', (obj) => {
@@ -91,6 +112,10 @@ export default class App {
 
     // default focus object is hard-coded
     this.focus('n:eternal|main');
+
+    setTimeout(() => {
+      this.timeKeeper.start();
+    }, 2000);
   }
 
   /**
@@ -230,5 +255,24 @@ export default class App {
     }
 
     this.pool.appendChild(obj.element);
+  }
+
+  setNext(obj) {
+    const others = [...document.getElementsByClassName('next')];
+
+    for (const element of others)
+      if (element !== obj.element) element.classList.remove('next');
+
+    obj.element.classList.add('next');
+    this.nextObject = obj;
+  }
+
+  clearNext() {
+    const others = [...document.getElementsByClassName('next')];
+
+    for (const element of others)
+      element.classList.remove('next');
+
+    this.nextObject = null;
   }
 }
