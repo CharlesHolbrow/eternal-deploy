@@ -120,9 +120,6 @@ export default class App {
       this.updateObjectPosition(obj);
     });
 
-    // default focus object is hard-coded
-    this.focus('n:eternal|main');
-
     setTimeout(() => {
       this.timeKeeper.start();
     }, 2000);

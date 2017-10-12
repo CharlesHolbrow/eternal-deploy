@@ -21,8 +21,18 @@ window.MIDI = MIDI;
 window.onload = () => {
   const app = window.app = new App();
 
-  app.synk.setSubscription(['eternal|main']);
+  // Setup default subscription key / focus
+  let key = window.location.hash.slice(1);
+
+  if (!key || key === '') key = 'main'; // default: eternal|main
+
+  key = `eternal|${key}`;
+
+  app.synk.setSubscription([key]);
   app.synk.resolve();
+
+  // default focus object is hard-coded
+  app.focus(`n:${key}`);
 
   const form = document.getElementById('add');
 
