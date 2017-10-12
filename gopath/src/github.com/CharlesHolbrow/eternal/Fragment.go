@@ -13,23 +13,21 @@ import (
 type Fragment struct {
 	Notes    map[string]*Note
 	Voices   map[string]*Voice
-	sKey     string
 	synkConn *synk.Synk
 }
 
 // NewFragment - create a Fragment
-func NewFragment(key string, synkConn *synk.Synk) *Fragment {
+func NewFragment(keys []string, synkConn *synk.Synk) *Fragment {
 	notes := &Fragment{
 		Notes:    make(map[string]*Note),
 		Voices:   make(map[string]*Voice),
 		synkConn: synkConn,
-		sKey:     key,
 	}
 
 	conn := synkConn.Pool.Get()
 	defer conn.Close()
 
-	synk.LoadObjects(notes, conn, []string{key})
+	synk.LoadObjects(notes, conn, keys)
 
 	return notes
 }
@@ -53,11 +51,14 @@ func (frag *Fragment) Clear() {
 }
 
 // AddNote to the Fragment.
-// - The note's subscription key will be set
 // - The note will be given an ID if it does not have one
 func (frag *Fragment) AddNote(n *Note) error {
 	// Ensure that the new Note has a subscription key and ID
 	n.SetID(synk.NewID().String())
+
+	if n.GetSubKey() == "" {
+		return fmt.Errorf("Note has no subscription key %v", n)
+	}
 
 	// verify that the note isn't already in the fragment
 	if _, ok := frag.Notes[n.Key()]; ok {
@@ -66,17 +67,19 @@ func (frag *Fragment) AddNote(n *Note) error {
 
 	frag.Notes[n.Key()] = n
 
-	n.SetSubKey(frag.sKey)
 	frag.synkConn.Create(n)
 	return nil
 }
 
 // AddVoice to the Fragment.
-// - The voice's subscription key will be set
 // - The voice will be given an ID if it does not have one
 func (frag *Fragment) AddVoice(v *Voice) error {
 	// Ensure that the new Note has a subscription key and ID
 	v.SetID(synk.NewID().String())
+
+	if v.GetSubKey() == "" {
+		return fmt.Errorf("Voice has no subscription key %v", v)
+	}
 
 	// verify that the note isn't already in the fragment
 	if _, ok := frag.Voices[v.Key()]; ok {
@@ -85,7 +88,6 @@ func (frag *Fragment) AddVoice(v *Voice) error {
 
 	frag.Voices[v.Key()] = v
 
-	v.SetSubKey(frag.sKey)
 	frag.synkConn.Create(v)
 	return nil
 }
@@ -141,4 +143,8 @@ func BuildObject(typeKey string, data []byte) (synk.Object, error) {
 	}
 	txt := fmt.Sprintf("eternal.BuildObject: unsupported typeKey '%s'", typeKey)
 	return result, errors.New(txt)
+}
+
+type Parent interface {
+	GetSubKey() string
 }
