@@ -16,14 +16,14 @@ type Note struct {
 
 // AddLink to the note. Return an error if there is no more space
 func (n *Note) AddLink(newKey string) error {
-	for _, key := range n.Links {
-		if key == newKey {
+	for i := range n.Links {
+		if n.GetLinksElement(i) == newKey {
 			return errors.New("Cannot add link to note - it already has that link")
 		}
 	}
 
-	for i, key := range n.Links {
-		if key == "" {
+	for i := range n.Links {
+		if n.GetLinksElement(i) == "" {
 			n.SetLinksElement(i, newKey)
 			return nil
 		}
@@ -33,8 +33,8 @@ func (n *Note) AddLink(newKey string) error {
 
 // RemoveLink removes the first instance of a link
 func (n *Note) RemoveLink(removeKey string) error {
-	for i, key := range n.Links {
-		if key == removeKey {
+	for i := range n.Links {
+		if n.GetLinksElement(i) == removeKey {
 			n.SetLinksElement(i, "")
 			return nil
 		}
