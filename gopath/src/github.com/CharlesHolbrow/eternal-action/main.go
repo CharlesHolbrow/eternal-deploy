@@ -22,9 +22,8 @@ var env = os.Getenv("SYNK_ENV")
 
 func main() {
 	synkConn := synk.NewConnection(redisAddr)
-	subKey := "eternal|main"
 
-	part := eternal.NewFragment(subKey, synkConn)
+	part := eternal.NewFragment([]string{"eternal|main", "eternal|art"}, synkConn)
 
 	fmt.Printf("Got %d Notes and %d Voices\n", len(part.Notes), len(part.Voices))
 

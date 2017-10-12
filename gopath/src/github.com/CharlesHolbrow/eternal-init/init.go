@@ -23,7 +23,7 @@ func main() {
 	synkConn := synk.NewConnection(redisAddr)
 	subKey := "eternal|main"
 
-	part := eternal.NewFragment(subKey, synkConn)
+	part := eternal.NewFragment([]string{subKey}, synkConn)
 	part.Clear()
 
 	// This app expects there to be a single 'root object' where users begin
@@ -34,37 +34,38 @@ func main() {
 		Attrib: &neil,
 		// Note that IDs may not contain a colon character, because this will
 		// interfere with the object loader's type identification.
-		ID: strings.Replace(subKey, ":", "|", -1),
+		ID:     strings.Replace(subKey, ":", "|", -1),
+		SubKey: subKey,
 	}
 
 	whatFor := &eternal.Note{
-		Text: "What is this for?",
+		Text:   "What is this for?",
+		SubKey: subKey,
 	}
 	whatFor.SetID("whatfor")
 	initial.AddLink(whatFor.Key())
-	initial.Resolve()
 
 	model := &eternal.Note{
-		Text: "A new experimental model for how to communicate on the web",
-		ID:   "model",
+		Text:   "A new experimental model for how to communicate on the web",
+		ID:     "model",
+		SubKey: subKey,
 	}
 	whatFor.AddLink(model.Key())
-	whatFor.Resolve()
 
 	rationalize := &eternal.Note{
-		Text: "An introspection into how we rationalize our emotions",
-		ID:   "rationalize",
+		Text:   "An introspection into how we rationalize our emotions",
+		ID:     "rationalize",
+		SubKey: subKey,
 	}
 	part.AddNote(rationalize)
 	whatFor.AddLink(rationalize.Key())
-	whatFor.Resolve()
 
 	music := &eternal.Note{
-		Text: "A collaborative musical composition",
-		ID:   "music",
+		Text:   "A collaborative musical composition",
+		ID:     "music",
+		SubKey: subKey,
 	}
 	whatFor.AddLink(music.Key())
-	whatFor.Resolve()
 
 	// voices
 	numVoices := 8
