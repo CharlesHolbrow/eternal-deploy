@@ -28,13 +28,15 @@ window.onload = () => {
 
   if (!key || key === '') key = 'main'; // default: eternal|main
 
-  key = `eternal|${key}`;
+  const subKey = `eternal|${key}`;
 
-  app.synk.setSubscription([key]);
+  app.synk.setSubscription([subKey]);
   app.synk.resolve();
 
   // default focus object is hard-coded
-  app.focus(`n:${key}`);
+  key = `n:${subKey}`;
+  app.initialKey = key;
+  app.stack.push(key);
 
   const form = document.getElementById('add');
 
@@ -42,7 +44,7 @@ window.onload = () => {
     event.preventDefault();
 
     const elements = [...this.getElementsByTagName('input')];
-    const msg = { parent: app.focusKey };
+    const msg = { parent: app.stack.keys[app.stack.keys.length - 1] || app.initialKey };
 
     // Get all the values, and send resulting JSON
     elements.forEach((el) => { msg[el.getAttribute('name')] = el.value; });

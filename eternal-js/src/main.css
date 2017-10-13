@@ -15,7 +15,7 @@ body {
   font-size: 135%;
 }
 
-#links {
+#links, #levels .level {
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -48,12 +48,12 @@ body {
   margin: 12px;
 }
 
-#links .eternal-node span {
+#links .eternal-node span, #levels .level .eternal-node span {
   pointer-events: auto;
   cursor: pointer;
 }
 
-#links .eternal-node svg {
+#links .eternal-node svg #levels .level .eternal-node svg {
   pointer-events: visiblePainted;
   cursor: pointer;
 }

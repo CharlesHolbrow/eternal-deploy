@@ -25,6 +25,10 @@ export default class App {
     this.linkObjects = [null, null, null];
     this.nextObject = null;
 
+    // new system
+    this.initialKey = null;
+    this.initialObject = null;
+
     this.midi = new MIDI('IAC');
     this.synk = new Synk(url);
     this.endpoint = new AppEndpoint(this);
@@ -74,7 +78,6 @@ export default class App {
             this.midi.send(help.noteOn(noteNum, 0, 0), beatTime + duration - 5); // beatTime + duration * 2 will cause problems if we speed up the tempo
           }
         }
-        this.clearNext();
       }
     });
 
@@ -97,16 +100,17 @@ export default class App {
 
     this.synk.objects.on('add', (obj) => {
       this.updateObject(obj);
-      this.updateObjectPosition(obj);
       obj.element.classList.add('fade-in');
+      this.stack.resolve();
+      this.stack.updateDoc();
     });
 
     this.synk.objects.on('rem', (obj) => {
       if (obj.element && obj.element.parentElement)
         obj.element.parentElement.removeChild(obj.element);
 
-      if (obj === this.focusObject)
-        this.focusOnObject(null);
+      if (obj === this.initialObject)
+        this.setInitialObject(null)
     });
 
     this.synk.objects.on('mod', (obj) => {
@@ -116,6 +120,7 @@ export default class App {
     this.synk.objects.on('click', (obj) => {
       // if (obj.element && obj.key) this.focus(obj.key);
       this.setNext(obj);
+      if (obj && obj.key) this.stack.focus(obj.key);
     });
 
     this.synk.objects.on('updatePosition', (obj) => {
@@ -132,32 +137,17 @@ export default class App {
    * @param {Object} object - the synk object to inspect
    */
   updateObject(object) {
-    // first check if the object is the focus object
-    if (object.key === this.focusKey) {
-      this.focusOnObject(object);
+    if (object.key === this.initialKey) {
+      this.setInitialObject(object);
 
       return;
     }
-
-    // check if the object is a link
-    if (this.focusObject && this.focusObject.links) {
-      const index = this.focusObject.links.indexOf(object.key);
-
-      if (index !== -1) {
-        this.setLink(object.key, index);
-
-        return;
-      }
-    }
-
-    if (object.element.parentElement !== this.pool)
-      this.pool.appendChild(object.element);
   }
 
   /**
    * @param {string} objKey - the object to focus on.
    */
-  focus(objKey) {
+  DELETEfocus(objKey) {
     this.focusKey = objKey;
 
     const obj = this.synk.objects.get(objKey);
@@ -210,7 +200,7 @@ export default class App {
    * @param {String} objectKey - the key of the object to set
    * @param {Number} index - 0, 1, or 2 - the index we will set the link to
    */
-  setLink(objectKey, index) {
+  DELETEsetLink(objectKey, index) {
     const lClass = `l${index}`;
     const currentObject = this.linkObjects[index];
 
@@ -247,7 +237,7 @@ export default class App {
    * Ensure that the object's element is in a suitable place.
    * @param {Object} obj - synk object with .element
    */
-  updateObjectPosition(obj) {
+  DELETEupdateObjectPosition(obj) {
     if (obj.element.classList.contains('link')) {
       // call .appendChild only if necessary - prevent re-triggering css transitions
       if (obj.element.parentElement !== this.linksDiv)
@@ -267,21 +257,34 @@ export default class App {
   }
 
   setNext(obj) {
-    const others = [...document.getElementsByClassName('next')];
+    const parent = obj.element.parentElement;
 
-    for (const element of others)
-      if (element !== obj.element) element.classList.remove('next');
+    if (parent.tagName.toLowerCase() !== 'div') return;
+
+    const all = [...parent.children];
+
+    for (const child of [...parent.children]) {
+      if (child !== obj.element)
+        child.classList.remove('next');
+    }
 
     obj.element.classList.add('next');
-    this.nextObject = obj;
   }
 
-  clearNext() {
-    const others = [...document.getElementsByClassName('next')];
+  setInitialObject(obj) {
+    if (this.initialObject === obj) return;
 
-    for (const element of others)
-      element.classList.remove('next');
+    // Remove old object
+    if (this.initialObject || !obj) {
+      this.initialObject.element.classList.remove('focus');
+      this.initialObject.element.parent.removeChild(this.initialObject);
+    }
 
-    this.nextObject = null;
+    this.initialObject = obj || null;
+    // Add new
+    if (obj) {
+      obj.element.classList.add('focus');
+      this.focusDiv.appendChild(obj.element);
+    }
   }
 }

@@ -21,6 +21,8 @@ export default class Stack {
   }
 
   resolve() {
+    this.data = [];
+    this.objects = [];
     for (const [i, key] of this.keys.entries()) {
       const object = this.synk.objects.get(key);
 
@@ -37,8 +39,9 @@ export default class Stack {
 
       const links = object.links.map((v) => this.synk.objects.get(v));
 
-      this.data[i] = links;
+      this.data[i] = links.filter((d) => !!d);
       this.data[i].key = key;
+
     }
   }
 
@@ -58,15 +61,43 @@ export default class Stack {
 
     levels.exit().remove();
 
-    const elements = d3.selectAll('#levels div.level').selectAll('.eternal-node')
-      .data((d) => d);
+    console.log('levels enter, exit', levels.enter().size(), levels.exit().size());
 
-    elements.enter().append((d) => {
-      if (!d) return document.createElement('div');
+    const nodes = d3.selectAll('#levels div.level')
+      .selectAll('.eternal-node')
+      .data((d) => d, (d) => d.key);
 
-      return d.element;
-    });
+    nodes.enter().append((d) => d.element);
+    nodes.exit().remove();
+  }
 
-    elements.exit().remove();
+  focus(key) {
+    // First check if this key is in the stack
+    for (const [i, row] of this.data.entries()) {
+      for (const col of row) {
+        if (col.key === key) {
+          // found it in row i. That means we want to go back to that row and add this to after it
+          console.log('found focus item in row', i);
+          this.keys = this.keys.slice(0, i + 1);
+          this.keys.push(key);
+          this.resolve();
+          this.updateDoc();
+
+          return;
+        }
+      }
+    }
+
+    if (key === this.keys[0]) {
+      this.keys = this.keys.slice(0, 1);
+      this.resolve();
+      this.updateDoc();
+
+      return;
+    }
+
+    this.keys = [key];
+    this.resolve();
+    this.updateDoc();
   }
 }
