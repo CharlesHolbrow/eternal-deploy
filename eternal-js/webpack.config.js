@@ -14,7 +14,7 @@ const outPath = isProduction ? 'production' : 'development';
 const config = {
   entry: {
     app: './src/index.js',
-    vendor: ['kefir', 'eventemitter3', '@tweenjs/tween.js', 'vexflow'],
+    vendor: ['kefir', 'eventemitter3', '@tweenjs/tween.js', 'vexflow', 'd3-selection'],
   },
   output: {
     filename: '[name].bundle.js',

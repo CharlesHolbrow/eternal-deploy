@@ -7,6 +7,7 @@ import Voice from './Voice.js';
 import MIDI from './MIDI.js';
 import ChordLibrary from './ChordLibrary.js';
 import TimeKeeper from './TimeKeeper.js';
+import Stack from './Stack.js';
 
 /**
 * High level Aether Application
@@ -27,6 +28,7 @@ export default class App {
     this.midi = new MIDI('IAC');
     this.synk = new Synk(url);
     this.endpoint = new AppEndpoint(this);
+    this.stack = new Stack(this.synk);
 
     // Chord library makes it easy to send midi!
     this.chordLibrary = new ChordLibrary();

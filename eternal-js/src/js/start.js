@@ -3,6 +3,7 @@ import Emitter from 'eventemitter3';
 import Kefir from 'kefir';
 import { Flow as VF } from 'vexflow';
 import help from 'midi-help';
+import  * as d3 from 'd3-selection';
 
 // Local
 import App from './App.js';
@@ -13,6 +14,7 @@ window.Kefir = Kefir;
 window.Emitter = Emitter;
 window.VF = VF;
 window.help = help;
+window.d3 = d3;
 
 // Aether Libs
 window.App = App;
