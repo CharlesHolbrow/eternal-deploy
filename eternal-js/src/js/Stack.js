@@ -23,6 +23,7 @@ export default class Stack {
   resolve() {
     this.data = [];
     this.objects = [];
+
     for (const [i, key] of this.keys.entries()) {
       const object = this.synk.objects.get(key);
 
@@ -67,7 +68,7 @@ export default class Stack {
       .selectAll('.eternal-node')
       .data((d) => d, (d) => d.key);
 
-    nodes.enter().append((d) => d.element);
+    nodes.enter().append((d) => d.element).classed('next', false);
     nodes.exit().remove();
   }
 
