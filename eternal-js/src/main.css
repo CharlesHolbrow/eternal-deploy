@@ -3,6 +3,7 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   background-color: black;
   color: white;
+  overflow-y: scroll;
   /* filter: drop-shadow(8px 8px 10px red); */
   /* filter: blur(2px); */
 }
@@ -15,7 +16,7 @@ body {
   font-size: 135%;
 }
 
-#links, #levels .level {
+#levels .level {
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -48,12 +49,12 @@ body {
   margin: 12px;
 }
 
-#links .eternal-node span, #levels .level .eternal-node span {
+#levels .level .eternal-node span {
   pointer-events: auto;
   cursor: pointer;
 }
 
-#links .eternal-node svg #levels .level .eternal-node svg {
+#levels .level .eternal-node svg {
   pointer-events: visiblePainted;
   cursor: pointer;
 }

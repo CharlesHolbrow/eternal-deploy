@@ -27,22 +27,22 @@ export default class Stack {
     for (const [i, key] of this.keys.entries()) {
       const object = this.synk.objects.get(key);
 
-      if (!object) {
-        this.objects = this.objects.slice(0, i);
-        this.data = this.data.slice(0, i);
-
-        return;
-      }
+      if (!object) break;
 
       this.objects[i] = object;
 
-      if (!object.links) return;
+      if (!object.links) break;
 
       const links = object.links.map((v) => this.synk.objects.get(v));
 
       this.data[i] = links.filter((d) => !!d);
       this.data[i].key = key;
+    }
 
+    // The last row should not have anything selected
+    if (this.data.length) {
+      for (const obj of this.data[this.data.length - 1])
+        obj.element.classList.remove('next');
     }
   }
 
@@ -62,8 +62,6 @@ export default class Stack {
 
     levels.exit().remove();
 
-    console.log('levels enter, exit', levels.enter().size(), levels.exit().size());
-
     const nodes = d3.selectAll('#levels div.level')
       .selectAll('.eternal-node')
       .data((d) => d, (d) => d.key);
@@ -78,7 +76,6 @@ export default class Stack {
       for (const col of row) {
         if (col.key === key) {
           // found it in row i. That means we want to go back to that row and add this to after it
-          console.log('found focus item in row', i);
           this.keys = this.keys.slice(0, i + 1);
           this.keys.push(key);
           this.resolve();
