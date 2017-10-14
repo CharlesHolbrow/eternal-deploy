@@ -113,7 +113,6 @@ export default class App {
 
     this.synk.objects.on('click', (obj) => {
       // if (obj.element && obj.key) this.focus(obj.key);
-      this.setNext(obj);
       if (obj && obj.key) this.stack.focus(obj.key);
     });
 
@@ -138,28 +137,14 @@ export default class App {
     }
   }
 
-  setNext(obj) {
-    const parent = obj.element.parentElement;
-
-    if (parent.tagName.toLowerCase() !== 'div') return;
-
-    const all = [...parent.children];
-
-    for (const child of [...parent.children]) {
-      if (child !== obj.element)
-        child.classList.remove('next');
-    }
-
-    obj.element.classList.add('next');
-  }
-
   setInitialObject(obj) {
     if (this.initialObject === obj) return;
 
     // Remove old object
     if (this.initialObject || !obj) {
       this.initialObject.element.classList.remove('focus');
-      this.initialObject.element.parent.removeChild(this.initialObject);
+      if (this.initialObject.element.parent)
+        this.initialObject.element.parent.removeChild(this.initialObject);
     }
 
     this.initialObject = obj || null;

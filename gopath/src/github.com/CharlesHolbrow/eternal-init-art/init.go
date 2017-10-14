@@ -31,7 +31,7 @@ func main() {
 	// This app expects there to be a single 'root object' where users begin
 	// their journey.
 	initial := &eternal.Note{
-		Text: "A conversation about Art at the Media Lab",
+		Text: "A Conversation About Art at the Media Lab",
 		ID:   strings.Replace(subKey, ":", "|", -1),
 	}
 	notes = append(notes, initial)
@@ -110,7 +110,7 @@ func main() {
 	present.AddLink(secret.Key())
 
 	whatIs := &eternal.Note{
-		Text: "In hindsight, we can identify the projects and professors who shaped the art culture at the media lab. It's harder to tell what arts culture is right now. What Do we want 'Art' to mean?",
+		Text: "In hindsight, we can identify the projects and professors who shaped the art culture at the media lab. It's harder to tell what arts culture is right now. What do we want 'Art' to mean?",
 		ID:   "artmeaning",
 	}
 	notes = append(notes, whatIs)
@@ -149,7 +149,7 @@ func main() {
 	notes = append(notes, future)
 
 	howtothink := &eternal.Note{
-		Text: "How to think - A class on artistic rigor",
+		Text: "How to Think - A class on artistic rigor",
 		ID:   "howtothink",
 	}
 	notes = append(notes, howtothink)

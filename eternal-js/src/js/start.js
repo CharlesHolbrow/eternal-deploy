@@ -36,7 +36,7 @@ window.onload = () => {
   // default focus object is hard-coded
   key = `n:${subKey}`;
   app.initialKey = key;
-  app.stack.push(key);
+  app.stack.keys.push(key);
 
   const form = document.getElementById('add');
 

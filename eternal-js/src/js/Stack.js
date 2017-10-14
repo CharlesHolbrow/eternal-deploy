@@ -13,9 +13,12 @@ export default class Stack {
     this.synk = synk;
 
     // Array of object keys from top to bottom
-    this.keys = [];
+    // this.keys is the main input to stack.
+    this.keys = []; // starting with the top prompt
+    // When we resolve() iterate over the keys, and try to find objects until
+    // one is missing.
     this.objects = [];
-    // array or arrays. each sub array is a collection of synk objects
+    // data is an array of arrays. Inner arrays contain synk objects
     this.data = [];
     this.root = null;
   }
@@ -33,22 +36,30 @@ export default class Stack {
 
       if (!object.links) break;
 
-      const links = object.links.map((v) => this.synk.objects.get(v));
+      const links = object.links
+        .map((v) => this.synk.objects.get(v))
+        .filter((d) => !!d);
 
-      this.data[i] = links.filter((d) => !!d);
+      this.data[i] = links;
       this.data[i].key = key;
     }
 
     // The last row should not have anything selected
-    if (this.data.length) {
-      for (const obj of this.data[this.data.length - 1])
-        obj.element.classList.remove('next');
-    }
-  }
+    // Charles: Why Not? don't we need this to append to the last row?
+    // Commenting this out for now.
+    // if (this.data.length) {
+    //   for (const obj of this.data[this.data.length - 1])
+    //     obj.element.classList.remove('next');
+    // }
 
-  push(key) {
-    this.keys.push(key);
-    this.resolve();
+    // iterate over all rows but the last one, set the next class accordingly
+    for (const [i, links] of this.data.entries()) {
+      for (const link of links) {
+        link.element.classList.remove('next');
+
+        if (link === this.objects[i + 1]) link.element.classList.add('next');
+      }
+    }
   }
 
   updateDoc() {
@@ -66,7 +77,7 @@ export default class Stack {
       .selectAll('.eternal-node')
       .data((d) => d, (d) => d.key);
 
-    nodes.enter().append((d) => d.element).classed('next', false);
+    nodes.enter().append((d) => d.element)
     nodes.exit().remove();
   }
 
