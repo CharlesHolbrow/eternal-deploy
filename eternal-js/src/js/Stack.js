@@ -44,14 +44,6 @@ export default class Stack {
       this.data[i].key = key;
     }
 
-    // The last row should not have anything selected
-    // Charles: Why Not? don't we need this to append to the last row?
-    // Commenting this out for now.
-    // if (this.data.length) {
-    //   for (const obj of this.data[this.data.length - 1])
-    //     obj.element.classList.remove('next');
-    // }
-
     // iterate over all rows but the last one, set the next class accordingly
     for (const [i, links] of this.data.entries()) {
       for (const link of links) {
