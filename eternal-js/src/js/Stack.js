@@ -46,10 +46,24 @@ export default class Stack {
 
     // iterate over all rows but the last one, set the next class accordingly
     for (const [i, links] of this.data.entries()) {
+      let active = null;
+
       for (const link of links) {
         link.element.classList.remove('next');
+        link.element.classList.remove('greyed');
 
-        if (link === this.objects[i + 1]) link.element.classList.add('next');
+        // this is one of the focus object
+        if (link === this.objects[i + 1]) {
+          link.element.classList.add('next');
+          active = link;
+        }
+      }
+      // If we have a selected object on this row, dim the other objects
+      if (active) {
+        for (const link of links) {
+          if (link !== active)
+            link.element.classList.add('greyed');
+        }
       }
     }
   }
@@ -100,5 +114,9 @@ export default class Stack {
     this.keys = [key];
     this.resolve();
     this.updateDoc();
+  }
+
+  get length() {
+    return this.keys.length;
   }
 }

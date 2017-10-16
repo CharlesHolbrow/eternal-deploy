@@ -41,17 +41,96 @@ export default class App {
     this.hr = document.getElementById('beat');
 
     // Time Keeper helps us keep accurate time in spite of the jittery js event loop
-    const bpm = 10;
+    const bpm = 33;
+    // song position pointer
+    let spp = -1;
+    let measure = -1;
+    let beat = -1;
+
+    const baseMinor =   [60, 62, 63, 65, 67, 68, 70, 72];
+    const baseRideVel = [100, 50, 74, 45];
+
+    this.change = 0;
+    let minor =   [60, 62, 63, 65, 67, 68, 70, 72];
+    let rideVel = [100, 50, 74, 45];
+
+    this.modulate = () => {
+      this.change = (this.change + 7) % 12;
+      if (this.change > 6) this.change -= 12;
+      minor = baseMinor.map((v) => v + this.change);
+    };
 
     this.timeKeeper = new TimeKeeper(bpm, (i, beatTime, duration) => {
-      this.midi.send(help.noteOn(39, 100, 9), beatTime);
-      this.midi.send(help.noteOn(39, 0, 9), beatTime + 100);
-      this.midi.send(help.noteOn(39, 50, 9), beatTime + (duration / 4));
-      this.midi.send(help.noteOn(39, 0, 9), beatTime + (duration / 4) + 100);
-      this.midi.send(help.noteOn(39, 84, 9), beatTime + (duration / 2));
-      this.midi.send(help.noteOn(39, 0, 9), beatTime + (duration / 2) + 100);
-      this.midi.send(help.noteOn(39, 45, 9), beatTime + (duration / 4 * 3));
-      this.midi.send(help.noteOn(39, 0, 9), beatTime + (duration / 4 * 3) + 100);
+      // spp counts total beats elapsed
+      spp++;
+
+      // loops over the indexes of rideVel;
+      beat = spp % rideVel.length;
+
+      // measure counts total measure elapsed
+      if (beat === 0) measure++;
+
+      // duration of one measure
+      const mDur = duration * rideVel.length;
+
+      // send midi
+
+      // ride
+      if (this.stack.length > 1) {
+        const vr = rideVel[spp % rideVel.length];
+
+        this.midi.send(help.noteOn(39, vr, 9), beatTime);
+        this.midi.send(help.noteOff(39, 0, 9), beatTime + 100);
+      }
+      // side-chain kick
+      this.midi.send(help.noteOn(36, 127, 10), beatTime);
+      this.midi.send(help.noteOff(36, 0, 10), beatTime + 100);
+
+      const p1 = minor[measure % minor.length];
+      const p2 = minor[(measure + 4) % minor.length];
+      const p3 = p1 + 12;
+      const p4 = minor[(measure + 2) % minor.length] + 12;
+
+      // Melody
+      if (this.stack.length > 2) {
+        if (beat === 0) {
+          // this fires ever time the drum loop restarts
+          const v1 = 100;
+
+          this.midi.send(help.noteOn(p1, v1, 1), beatTime);
+          this.midi.send(help.noteOff(p1, 0, 1), beatTime + (mDur * 1.25));
+        }
+
+        if (beat === 2) {
+          const v2 = Math.floor((Math.random() * 99) + 1);
+          const p1 = minor[(measure + 5) % minor.length];
+          const start = beatTime + (2 / 3 * duration);
+          const end = start + (1 / 3 * duration) + duration;
+
+          this.midi.send(help.noteOn(p1, v2, 1), start);
+          this.midi.send(help.noteOff(p1, 0, 1), end);
+        }
+      }
+
+      // bass
+      if (this.stack.length > 3) {
+        const pb = p1 - 24; // pitch (bass)
+
+        this.midi.send(help.noteOn(pb, 100, 2), beatTime);
+        this.midi.send(help.noteOff(pb, 0, 2), beatTime + duration - 1);
+      }
+
+      // gated pad
+      if (this.stack.length > 4) {
+        this.midi.send(help.noteOn(p1, 100, 3), beatTime);
+        this.midi.send(help.noteOff(p1, 0, 3), beatTime + duration - 1);
+        this.midi.send(help.noteOn(p2, 100, 3), beatTime);
+        this.midi.send(help.noteOff(p2, 0, 3), beatTime + duration - 1);
+        this.midi.send(help.noteOn(p3, 100, 3), beatTime);
+        this.midi.send(help.noteOff(p3, 0, 3), beatTime + duration - 1);
+        this.midi.send(help.noteOn(p4, 100, 3), beatTime);
+        this.midi.send(help.noteOff(p4, 0, 3), beatTime + duration - 1);
+      }
 
       this.hr.style.transition = '';
       this.hr.style.opacity = '0';
