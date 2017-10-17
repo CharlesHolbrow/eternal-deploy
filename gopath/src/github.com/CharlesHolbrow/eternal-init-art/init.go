@@ -232,7 +232,12 @@ func main() {
 	notes = append(notes, howtothink)
 	future.AddLink(howtothink.Key())
 
-	// Art
+	howtomake := &eternal.Note{
+		Text: "The class \"How To Make (Almost) Anything\" has famously integrated itself into the culture of the Media Lab",
+		ID:   "howtomake",
+	}
+	notes = append(notes, howtomake)
+	howtomake.AddLink(howtothink.Key())
 
 	// Create the root object in Redis
 	fmt.Println("Creating initial values...")
