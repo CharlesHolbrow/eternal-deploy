@@ -26,7 +26,7 @@ window.onload = () => {
   // Setup default subscription key / focus
   let key = window.location.hash.slice(1);
 
-  if (!key || key === '') key = 'main'; // default: eternal|main
+  if (!key || key === '') key = 'art'; // default: eternal|art
 
   const subKey = `eternal|${key}`;
 
