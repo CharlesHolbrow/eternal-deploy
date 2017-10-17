@@ -237,7 +237,7 @@ func main() {
 		ID:   "howtomake",
 	}
 	notes = append(notes, howtomake)
-	howtomake.AddLink(howtothink.Key())
+	howtothink.AddLink(howtomake.Key())
 
 	// Create the root object in Redis
 	fmt.Println("Creating initial values...")
