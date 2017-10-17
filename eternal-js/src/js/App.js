@@ -191,8 +191,11 @@ export default class App {
     });
 
     this.synk.objects.on('click', (obj) => {
-      // if (obj.element && obj.key) this.focus(obj.key);
-      if (obj && obj.key) this.stack.focus(obj.key);
+      if (obj.element && obj.element.classList.contains('greyed')) {
+        this.modulate();
+        console.log('modulate to:', this.change);
+      }
+      if (obj.key) this.stack.focus(obj.key);
     });
 
     this.synk.objects.on('updatePosition', (obj) => {
