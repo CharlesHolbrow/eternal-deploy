@@ -37,6 +37,7 @@ export default class Stack {
       if (!object.links) break;
 
       const links = object.links
+        .filter((d) => !!d)
         .map((v) => this.synk.objects.get(v))
         .filter((d) => !!d);
 
