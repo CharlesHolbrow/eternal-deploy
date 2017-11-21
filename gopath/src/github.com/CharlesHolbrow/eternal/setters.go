@@ -2,7 +2,7 @@ package eternal
 
 import "github.com/CharlesHolbrow/synk"
 
-// noteDiff diff type for a character
+// noteDiff diff type for synk.Object
 type noteDiff struct {
   SubKey *string `json:"subKey,omitempty"`
   Number *int `json:"number,omitempty"`
@@ -24,6 +24,7 @@ func (o *Note) Resolve() interface{} {
   if o.diff.SubKey != nil {o.SubKey = *o.diff.SubKey}
   if o.diff.Number != nil {o.Number = *o.diff.Number}
   if o.diff.Velocity != nil {o.Velocity = *o.diff.Velocity}
+  o.V++
   diff := o.diff
   o.diff = noteDiff{}
   return diff
@@ -58,16 +59,6 @@ func (o *Note) Copy() synk.Object {
 // Resolve() will return a diff with all the fields initialized.
 func (o *Note) Init() {
 	o.diff = o.State().(noteDiff)
-}
-// GetID returns the ID
-func (o *Note) GetID() string { return o.ID }
-// SetID -- but only if it has not been set. This helps us avoid accidentally
-// setting it twice. Return the item's ID either way.
-func (o *Note) SetID(id string) string {
-	if o.ID == "" {
-		o.ID = id
-	}
-	return o.ID
 }
 // SetSubKey on diff
 func (o *Note) SetSubKey(v string) {
@@ -126,3 +117,13 @@ func (o *Note) GetVelocity() int {
 }
 // GetVelocity. Diff method
 func (o noteDiff) GetVelocity() *int { return o.Velocity }
+// GetID returns the ID
+func (o *Note) GetID() string { return o.ID }
+// SetID -- but only if it has not been set. This helps us avoid accidentally
+// setting it twice. Return the item's ID either way.
+func (o *Note) SetID(id string) string {
+	if o.ID == "" {
+		o.ID = id
+	}
+	return o.ID
+}

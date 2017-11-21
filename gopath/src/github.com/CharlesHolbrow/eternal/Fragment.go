@@ -10,11 +10,11 @@ import (
 type Fragment struct {
 	Notes    map[string]*Note
 	sKey     string
-	synkConn *synk.RedisConnection
+	synkConn *synk.Synk
 }
 
 // NewFragment - create a Fragment
-func NewFragment(key string, synkConn *synk.RedisConnection) *Fragment {
+func NewFragment(key string, synkConn *synk.Synk) *Fragment {
 	notes := &Fragment{
 		Notes:    make(map[string]*Note),
 		synkConn: synkConn,

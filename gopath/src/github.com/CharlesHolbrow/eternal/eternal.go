@@ -12,6 +12,7 @@ import (
 // generate the required methods.
 //@PA:n
 type Note struct {
+	synk.Tag `bson:",inline"`
 	ID       string `json:"id"`
 	SubKey   string `json:"subKey"`
 	Number   int    `json:"number"`
