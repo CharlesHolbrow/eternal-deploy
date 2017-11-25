@@ -13,6 +13,10 @@ type Fragment struct {
 	synkConn *synk.Synk
 }
 
+func constructor(typeKey string) synk.MongoObject {
+	return &Note{}
+}
+
 // NewFragment - create a Fragment
 func NewFragment(key string, synkConn *synk.Synk) *Fragment {
 	notes := &Fragment{
@@ -24,7 +28,14 @@ func NewFragment(key string, synkConn *synk.Synk) *Fragment {
 	conn := synkConn.Pool.Get()
 	defer conn.Close()
 
-	synk.LoadObjects(notes, conn, []string{key})
+	collection := synkConn.Mongo.Copy().DB("synk").C("objects")
+
+	objects := synk.GetObjects(collection, []string{key}, constructor)
+	for _, obj := range objects {
+		if obj, ok := obj.(*Note); ok {
+			notes.Notes[obj.TagGetID()] = obj
+		}
+	}
 
 	return notes
 }
@@ -47,7 +58,7 @@ func (frag *Fragment) LoadObject(typeKey string, bytes []byte) {
 
 // AddNote to the Part. The note's subscription key will be set
 func (frag *Fragment) AddNote(n *Note) {
-	n.SetSubKey(frag.sKey)  // Ensure SubKey
-	frag.synkConn.Create(n) // Ensures ID
+	n.SetSubKey(frag.sKey)            // Ensure SubKey
+	frag.synkConn.MongoSynk.Create(n) // Ensures ID
 	frag.Notes[n.Key()] = n
 }

@@ -21,6 +21,7 @@ type Note struct {
 }
 
 // BuildObject creates synk Objects for the eternal app
+//BUG(charles): this should be removed after the refactor
 func BuildObject(typeKey string, data []byte) (synk.Object, error) {
 	var result synk.Object
 	var err error
@@ -33,4 +34,12 @@ func BuildObject(typeKey string, data []byte) (synk.Object, error) {
 	}
 	txt := fmt.Sprintf("eternal.BuildObject: unsupported typeKey '%s'", typeKey)
 	return result, errors.New(txt)
+}
+
+func ConstructContainer(typeKey string) synk.MongoObject {
+	switch typeKey {
+	case "n":
+		return &Note{}
+	}
+	return nil
 }

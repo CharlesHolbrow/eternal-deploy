@@ -22,7 +22,7 @@ func main() {
 
 	synkConn := synk.NewConnection(redisAddr)
 
-	wsHandler := synk.NewHandler(synkConn, eternal.BuildObject,
+	wsHandler := synk.NewHandler(synkConn, eternal.ConstructContainer,
 		func(client *synk.Client) synk.CustomClient {
 			return eternal.Client{}
 		})
