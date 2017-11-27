@@ -19,7 +19,6 @@ var redisAddr = os.Getenv("SYNK_REDIS_HOST") + ":6379"
 var env = os.Getenv("SYNK_ENV")
 
 func main() {
-
 	synkConn := synk.NewConnection(redisAddr)
 
 	wsHandler := synk.NewHandler(synkConn, eternal.ConstructContainer,

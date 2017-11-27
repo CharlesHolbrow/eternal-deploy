@@ -20,7 +20,6 @@ var env = os.Getenv("SYNK_ENV")
 
 func main() {
 	synkConn := synk.NewConnection(redisAddr)
-	synkConn.MongoSynk.RConn = synkConn.Pool.Get()
 
 	part := eternal.NewFragment("eternal:main", synkConn)
 	fmt.Printf("Got %d objects\n", len(part.Notes))
@@ -32,7 +31,7 @@ func main() {
 	// remove a random object
 	if len(part.Notes) > 3 {
 		for _, note := range part.Notes {
-			synkConn.MongoSynk.Delete(note)
+			part.Mutator.Delete(note)
 			delete(part.Notes, note.TagGetID())
 			break
 		}
@@ -43,7 +42,7 @@ func main() {
 			fmt.Printf("Num: %d\tVel: %d\n", n.GetNumber(), n.GetVelocity())
 			n.SetNumber((n.GetNumber() + 1) % 128)
 			// synkConn.Modify(n)
-			synkConn.MongoSynk.Modify(n)
+			part.Mutator.Modify(n)
 			time.Sleep(time.Second)
 		}
 	}

@@ -1,10 +1,6 @@
 package eternal
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
-
 	"github.com/CharlesHolbrow/synk"
 )
 
@@ -20,22 +16,7 @@ type Note struct {
 	diff     noteDiff
 }
 
-// BuildObject creates synk Objects for the eternal app
-//BUG(charles): this should be removed after the refactor
-func BuildObject(typeKey string, data []byte) (synk.Object, error) {
-	var result synk.Object
-	var err error
-
-	switch typeKey {
-	case "n":
-		note := &Note{}
-		err = json.Unmarshal(data, note)
-		return note, err
-	}
-	txt := fmt.Sprintf("eternal.BuildObject: unsupported typeKey '%s'", typeKey)
-	return result, errors.New(txt)
-}
-
+// ConstructContainer creates a container for a eternal synk Object
 func ConstructContainer(typeKey string) synk.MongoObject {
 	switch typeKey {
 	case "n":
