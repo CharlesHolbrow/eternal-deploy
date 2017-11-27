@@ -17,7 +17,7 @@ type Note struct {
 }
 
 // ConstructContainer creates a container for a eternal synk Object
-func ConstructContainer(typeKey string) synk.MongoObject {
+func ConstructContainer(typeKey string) synk.Object {
 	switch typeKey {
 	case "n":
 		return &Note{}

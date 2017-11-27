@@ -21,6 +21,6 @@ func (cc Client) OnMessage(client *synk.Client, method string, data []byte) {
 }
 
 // OnSubscribe is called with the client changes their subscription
-func (cc Client) OnSubscribe(client *synk.Client, subKeys []string, objs []synk.MongoObject) {
+func (cc Client) OnSubscribe(client *synk.Client, subKeys []string, objs []synk.Object) {
 	log.Printf("Custom Client: Subscription add(%d) objs(%d)", len(subKeys), len(objs))
 }
