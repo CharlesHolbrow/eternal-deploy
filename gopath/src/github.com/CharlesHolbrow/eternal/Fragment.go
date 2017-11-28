@@ -7,13 +7,14 @@ import (
 // Fragment stores the contents of a subscription key
 type Fragment struct {
 	Notes    map[string]*Note
-	sKey     string
+	sKey1    string
+	sKey2    string
 	synkConn *synk.Synk
 	Mutator  synk.Mutator
 }
 
 // NewFragment - create a Fragment
-func NewFragment(key string, synkConn *synk.Synk) *Fragment {
+func NewFragment(k1, k2 string, synkConn *synk.Synk) *Fragment {
 	mSynk := &synk.MongoSynk{
 		Coll:    synkConn.Mongo.Copy().DB("synk").C("objects"),
 		Creator: ConstructContainer,
@@ -23,11 +24,12 @@ func NewFragment(key string, synkConn *synk.Synk) *Fragment {
 	notes := &Fragment{
 		Notes:    make(map[string]*Note),
 		synkConn: synkConn,
-		sKey:     key,
+		sKey1:    k1,
+		sKey2:    k2,
 		Mutator:  mSynk,
 	}
 
-	objects, err := mSynk.Load([]string{key})
+	objects, err := mSynk.Load([]string{k1, k2})
 	if err != nil {
 		panic("Error initializing eternal Fragment: " + err.Error())
 	}
@@ -42,7 +44,18 @@ func NewFragment(key string, synkConn *synk.Synk) *Fragment {
 
 // AddNote to the Part. The note's subscription key will be set
 func (frag *Fragment) AddNote(n *Note) {
-	n.SetSubKey(frag.sKey) // Ensure SubKey
+	// Ensure SubKey
+	if n.GetSubKey() == "" {
+		n.SetSubKey(frag.sKey1)
+	}
+
 	frag.Mutator.Create(n) // Ensures ID
-	frag.Notes[n.Key()] = n
+	frag.Notes[n.TagGetID()] = n
+}
+
+func (frag *Fragment) K1() string {
+	return frag.sKey1
+}
+func (frag *Fragment) K2() string {
+	return frag.sKey2
 }
