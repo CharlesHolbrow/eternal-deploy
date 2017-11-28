@@ -19,12 +19,22 @@ var redisAddr = os.Getenv("SYNK_REDIS_HOST") + ":6379"
 var env = os.Getenv("SYNK_ENV")
 
 func main() {
-	synkConn := synk.NewConnection(redisAddr)
 
-	wsHandler := synk.NewHandler(synkConn, eternal.ConstructContainer,
-		func(client *synk.Client) synk.CustomClient {
+	mutator := &synk.MongoSynk{
+		Coll:      synk.DialMongo().DB("synk").C("objects"),
+		RedisPool: synk.DialRedis(redisAddr),
+		Creator:   eternal.ConstructContainer,
+	}
+
+	config := &synk.Config{
+		Mutator:              mutator,
+		RedisAddr:            redisAddr,
+		CustomClientConstructor: func(client *synk.Client) synk.CustomClient {
 			return eternal.Client{}
-		})
+		},
+	}
+
+	wsHandler := synk.NewHandler(config)
 
 	// In production we will serve the public directory with nginx. However,
 	// this will still be useful in development.

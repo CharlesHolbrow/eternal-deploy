@@ -19,9 +19,14 @@ var redisAddr = os.Getenv("SYNK_REDIS_HOST") + ":6379"
 var env = os.Getenv("SYNK_ENV")
 
 func main() {
-	synkConn := synk.NewConnection(redisAddr)
 
-	part := eternal.NewFragment("eternal:main", "eternal:other", synkConn)
+	mutator := &synk.MongoSynk{
+		Coll:      synk.DialMongo().DB("synk").C("objects"),
+		RedisPool: synk.DialRedis(redisAddr),
+		Creator:   eternal.ConstructContainer,
+	}
+
+	part := eternal.NewFragment("eternal:main", "eternal:other", mutator)
 	fmt.Printf("Got %d objects\n", len(part.Notes))
 
 	// Create a new note

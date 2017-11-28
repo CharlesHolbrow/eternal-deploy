@@ -6,30 +6,25 @@ import (
 
 // Fragment stores the contents of a subscription key
 type Fragment struct {
-	Notes    map[string]*Note
-	sKey1    string
-	sKey2    string
-	synkConn *synk.Synk
-	Mutator  synk.Mutator
+	Notes   map[string]*Note
+	Mutator synk.Mutator
+	sKey1   string
+	sKey2   string
 }
 
 // NewFragment - create a Fragment
-func NewFragment(k1, k2 string, synkConn *synk.Synk) *Fragment {
-	mSynk := &synk.MongoSynk{
-		Coll:    synkConn.Mongo.Copy().DB("synk").C("objects"),
-		Creator: ConstructContainer,
-		RConn:   synkConn.Pool.Get(), // BUG(charles): this connection is never closed
-	}
+//
+// Requires a clean Mutator
+func NewFragment(k1, k2 string, mutator synk.Mutator) *Fragment {
 
 	notes := &Fragment{
-		Notes:    make(map[string]*Note),
-		synkConn: synkConn,
-		sKey1:    k1,
-		sKey2:    k2,
-		Mutator:  mSynk,
+		Notes:   make(map[string]*Note),
+		sKey1:   k1,
+		sKey2:   k2,
+		Mutator: mutator,
 	}
 
-	objects, err := mSynk.Load([]string{k1, k2})
+	objects, err := notes.Mutator.Load([]string{k1, k2})
 	if err != nil {
 		panic("Error initializing eternal Fragment: " + err.Error())
 	}
