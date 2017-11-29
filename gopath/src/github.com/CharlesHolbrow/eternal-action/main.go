@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/CharlesHolbrow/eternal"
-	"github.com/CharlesHolbrow/synk"
 )
 
 // By default, look for redis locally at ":6379". We may specify another host by
@@ -20,12 +19,7 @@ var env = os.Getenv("SYNK_ENV")
 
 func main() {
 
-	mutator := &synk.MongoSynk{
-		Coll:      synk.DialMongo().DB("synk").C("objects"),
-		RedisPool: synk.DialRedis(redisAddr),
-		Creator:   eternal.ConstructContainer,
-	}
-
+	mutator := eternal.CreateMongoMutator(redisAddr)
 	part := eternal.NewFragment("eternal:main", "eternal:other", mutator)
 	fmt.Printf("Got %d objects\n", len(part.Notes))
 

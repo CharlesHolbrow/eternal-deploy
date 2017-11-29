@@ -48,9 +48,12 @@ func (frag *Fragment) AddNote(n *Note) {
 	frag.Notes[n.TagGetID()] = n
 }
 
+// K1 Gets the first subscription key
 func (frag *Fragment) K1() string {
 	return frag.sKey1
 }
+
+// K2 gets the fragment's second subscription key
 func (frag *Fragment) K2() string {
 	return frag.sKey2
 }

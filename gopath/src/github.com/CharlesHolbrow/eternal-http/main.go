@@ -20,20 +20,13 @@ var env = os.Getenv("SYNK_ENV")
 
 func main() {
 
-	mutator := &synk.MongoSynk{
-		Coll:      synk.DialMongo().DB("synk").C("objects"),
-		RedisPool: synk.DialRedis(redisAddr),
-		Creator:   eternal.ConstructContainer,
-	}
-
 	config := &synk.Config{
-		Mutator:              mutator,
-		RedisAddr:            redisAddr,
+		Loader:    eternal.CreateMongoLoader(redisAddr),
+		RedisAddr: redisAddr,
 		CustomClientConstructor: func(client *synk.Client) synk.CustomClient {
 			return eternal.Client{}
 		},
 	}
-
 	wsHandler := synk.NewHandler(config)
 
 	// In production we will serve the public directory with nginx. However,
