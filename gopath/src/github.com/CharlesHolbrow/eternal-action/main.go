@@ -19,7 +19,8 @@ var env = os.Getenv("SYNK_ENV")
 
 func main() {
 
-	mutator := eternal.CreateMongoMutator(redisAddr)
+	node := eternal.NewNode()
+	mutator := node.CreateMutator()
 	part := eternal.NewFragment("eternal:main", "eternal:other", mutator)
 	fmt.Printf("Got %d objects\n", len(part.Notes))
 

@@ -13,26 +13,12 @@ func ConstructContainer(typeKey string) synk.Object {
 	return nil
 }
 
-// The main purpose of this library is to export the two functions below.
-
-// CreateMongoMutator is used in a Fragment to Load objects from a subscription
-// key set, and then mutate the objects in that set.
-func CreateMongoMutator(redisAddr string) synk.Mutator {
-	mutator := &synk.MongoSynk{
-		Coll:      synk.DialMongo().DB("synk").C("objects"),
-		RedisPool: synk.DialRedis(redisAddr),
-		Creator:   ConstructContainer,
+// NewNode creates a new synk node. This node may be a mutator or http handler
+func NewNode() *synk.Node {
+	return &synk.Node{
+		NewContainer: ConstructContainer,
+		NewClient: func(client *synk.Client) synk.CustomClient {
+			return Client{}
+		},
 	}
-	return mutator
-}
-
-// CreateMongoLoader creates an initial Loader that can be Cloned. This is used
-// By the web socket handler to load object that will be sent to clients.
-func CreateMongoLoader(redisAddr string) synk.Loader {
-	loader := &synk.MongoSynk{
-		Coll:      synk.DialMongo().DB("synk").C("objects"),
-		RedisPool: synk.DialRedis(redisAddr),
-		Creator:   ConstructContainer,
-	}
-	return loader
 }
