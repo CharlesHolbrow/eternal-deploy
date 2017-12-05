@@ -1,4 +1,4 @@
-import { Objects, Connection, Synk }  from 'synk-js';
+import { Synk }  from 'synk-js';
 import AppEndpoint from './AppEndpoint.js';
 import Note from './Note.js';
 import Midier from './Midier.js';
@@ -17,6 +17,22 @@ export default class App {
     this.synk = new Synk(url);
     this.endpoint = new AppEndpoint(this);
     this.midier = new Midier();
+
+    this.midier.on('noteOn', (n, v, c) => {
+      this.synk.connection.send({
+        method: 'note',
+        on: true,
+        n, v, c,
+      });
+    });
+
+    this.midier.on('noteOff', (n, v, c) => {
+      this.synk.connection.send({
+        method: 'note',
+        on: false,
+        n, v, c,
+      });
+    });
 
     // All messages from the server will be passed to the endpoint. Thanks to
     // the connection object, even if we disconnect and reconnect, incoming

@@ -16,6 +16,7 @@
     "@tweenjs/tween.js": "^16.8.0",
     "eventemitter3": "^2.0.3",
     "kefir": "^3.7.2",
+    "midi-help": "^0.2.1",
     "synk-js": "^1.1.0"
   },
   "devDependencies": {
