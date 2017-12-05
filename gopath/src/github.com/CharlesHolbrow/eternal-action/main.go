@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"time"
 
@@ -21,7 +22,7 @@ func main() {
 
 	node := eternal.NewNode()
 	mutator := node.CreateMutator()
-	part := eternal.NewFragment("eternal:main", "eternal:other", mutator)
+	part := eternal.NewFragment("piano:main", "piano:other", mutator)
 	fmt.Printf("Got %d objects\n", len(part.Notes))
 
 	// Create a new note
@@ -31,7 +32,7 @@ func main() {
 	fmt.Println("added:", note.String())
 
 	// remove a random object
-	if len(part.Notes) > 3 {
+	if len(part.Notes) > 1 {
 		for _, note := range part.Notes {
 			part.Mutator.Delete(note)
 			delete(part.Notes, note.TagGetID())
@@ -39,30 +40,9 @@ func main() {
 		}
 	}
 
-	time.Sleep(time.Second * 3)
-
-	fmt.Println("Moving to second...")
-	note.SetSubKey(part.K2())
-	part.Mutator.Modify(note)
-
-	time.Sleep(time.Second * 3)
-
-	fmt.Println("Moving to unused...")
-	note.SetSubKey("eternal:unused")
-	part.Mutator.Modify(note)
-
-	time.Sleep(time.Second * 3)
-
-	fmt.Println("Moving back to original...")
-	note.SetSubKey(part.K1())
-	part.Mutator.Modify(note)
-
-	time.Sleep(time.Second * 3)
-
 	for {
 		for _, n := range part.Notes {
-			fmt.Printf("Num: %d\tVel: %d\n", n.GetNumber(), n.GetVelocity())
-			n.SetNumber((n.GetNumber() + 1) % 128)
+			n.SetNumber(rand.Intn(0x1000000))
 			part.Mutator.Modify(n)
 			time.Sleep(time.Second)
 		}

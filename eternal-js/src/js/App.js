@@ -1,6 +1,7 @@
 import { Objects, Connection, Synk }  from 'synk-js';
 import AppEndpoint from './AppEndpoint.js';
 import Note from './Note.js';
+import Midier from './Midier.js';
 
 /**
 * High level Aether Application
@@ -15,6 +16,7 @@ export default class App {
 
     this.synk = new Synk(url);
     this.endpoint = new AppEndpoint(this);
+    this.midier = new Midier();
 
     // All messages from the server will be passed to the endpoint. Thanks to
     // the connection object, even if we disconnect and reconnect, incoming
@@ -23,6 +25,12 @@ export default class App {
 
     // Set the default class for Characters
     this.synk.objects.byKey.createBranch('n').class = Note;
+
+    this.color = 0;
+
+    this.synk.objects.on('add', (obj, msg) => {});
+    this.synk.objects.on('mod', (obj, msg) => {});
+    this.synk.objects.on('rem', (obj, msg) => {});
 
     // We could replace 'close' with reconnect'
     this.synk.connection.on('close', () => {
