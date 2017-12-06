@@ -18,6 +18,15 @@ export default class Note {
 
     this.state = { key, type: 'Note' };
 
+    let v = state.velocity + 5;
+
+    v = v < 0 ? 0 : v;
+    v = v > 127 ? 127 : v;
+    v = Math.floor(v * 2);
+    v = v.toString(16);
+
+    this.color = `#0000${v}`;
+
     // Set any additional properties provided by the 'state' argument
     if (state !== undefined) this.update(state);
     this.parent.appendChild(this.element);
@@ -35,7 +44,7 @@ export default class Note {
     // update text
     const json = JSON.stringify(this.state, null, '  ');
 
-    this.elementCode.innerText = `${json}\n${this.color}`;
+    // this.elementCode.innerText = `${json}\n${this.color}`;
   }
 
   /**
@@ -43,7 +52,11 @@ export default class Note {
    * the synk server.
    */
   teardown() {
-    this.parent.removeChild(this.element);
+    this.color = '#000000';
+    this.element.style.flexGrow = 0.000001;
+    setTimeout(() => {
+      this.parent.removeChild(this.element);
+    }, 400);
   }
 
   /**
@@ -51,14 +64,16 @@ export default class Note {
    * @param {string|number} val - string representing color, or rrggbb integer
    *        number
    */
-  set number(val) {
+  set color(val) {
     let color;
 
-    if (typeof val === 'number') color = `#${val.toString(16)}`;
-    else if (typeof val === 'string') color = Math.floor(val);
+    if (typeof val === 'string') color = val;
     else return; // do nothing if val is not string or number;
 
-    this.color = color;
     this.element.style.backgroundColor = color;
+  }
+
+  get color() {
+    return this.element.style.backgroundColor;
   }
 }

@@ -34,6 +34,10 @@ export default class App {
       });
     });
 
+    this.midier.on('pedal', (down, c) => {
+      console.log('pedal down?', down, c);
+    });
+
     // All messages from the server will be passed to the endpoint. Thanks to
     // the connection object, even if we disconnect and reconnect, incoming
     // messages will still be passed through to this.endpoint.
@@ -41,8 +45,6 @@ export default class App {
 
     // Set the default class for Characters
     this.synk.objects.byKey.createBranch('n').class = Note;
-
-    this.color = 0;
 
     this.synk.objects.on('add', (obj, msg) => {});
     this.synk.objects.on('mod', (obj, msg) => {});

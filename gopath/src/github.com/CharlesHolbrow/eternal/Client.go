@@ -25,6 +25,7 @@ func (cc Client) OnMessage(client *synk.Client, method string, data []byte) {
 		note := &NoteEvent{}
 		if err := json.Unmarshal(data, note); err == nil {
 			fmt.Println("Note:", note)
+			cc.noteEvent(client, *note)
 		} else {
 			fmt.Println("Client send bad note event:", err)
 		}
@@ -34,6 +35,14 @@ func (cc Client) OnMessage(client *synk.Client, method string, data []byte) {
 // OnSubscribe is called with the client changes their subscription
 func (cc Client) OnSubscribe(client *synk.Client, subKeys []string, objs []synk.Object) {
 	log.Printf("Custom Client: Subscription add(%d) objs(%d)", len(subKeys), len(objs))
+}
+
+func (cc Client) noteEvent(client *synk.Client, ne NoteEvent) {
+	if json, err := json.Marshal(ne); err == nil {
+		client.Loader.Publish("piano", json)
+	} else {
+		fmt.Println("eternal client failed to marshall NoteEvent json", err.Error())
+	}
 }
 
 /***************************************************************

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"math/rand"
+	"log"
 	"os"
-	"time"
+
+	"github.com/garyburd/redigo/redis"
 
 	"github.com/CharlesHolbrow/eternal"
 )
@@ -22,29 +24,44 @@ func main() {
 
 	node := eternal.NewNode()
 	mutator := node.CreateMutator()
-	part := eternal.NewFragment("piano:main", "piano:other", mutator)
-	fmt.Printf("Got %d objects\n", len(part.Notes))
+	part := eternal.NewFragment("piano:main", mutator)
 
-	// Create a new note
-	// part.AddNote(&eternal.Note{})
-	note := &eternal.Note{}
-	part.AddNote(note)
-	fmt.Println("added:", note.String())
+	part.RemoveAllNotes()
 
-	// remove a random object
-	if len(part.Notes) > 1 {
-		for _, note := range part.Notes {
-			part.Mutator.Delete(note)
-			delete(part.Notes, note.TagGetID())
-			break
-		}
+	// get a redis connection and subscribe
+	rConn, err := redis.Dial("tcp", redisAddr)
+	if err != nil {
+		log.Panicln("error connecting to redis:", err)
+	}
+	rSubscription := redis.PubSubConn{Conn: rConn}
+	err = rSubscription.Subscribe("piano")
+	if err != nil {
+		log.Panicln("Error subscribing to piano")
 	}
 
 	for {
-		for _, n := range part.Notes {
-			n.SetNumber(rand.Intn(0x1000000))
-			part.Mutator.Modify(n)
-			time.Sleep(time.Second)
+		switch v := rSubscription.Receive().(type) {
+		case redis.Message:
+			event := &eternal.NoteEvent{}
+			if err := json.Unmarshal(v.Data, event); err == nil {
+				fmt.Println("Recived:", event.String())
+				note := &eternal.Note{
+					Number:   event.N,
+					Velocity: event.V,
+				}
+				if event.On {
+					part.AddNote(note)
+				} else {
+					part.RemoveNote(note)
+				}
+			} else {
+				fmt.Printf("Got Bad NoteEvent message from client: %s\n", v.Data)
+			}
+		case redis.Subscription:
+			// Redis is confirming our subscription v.Channel, v.Kind, v.Count
+		case error:
+			log.Println("eternal-action: Subscription receive error:", v)
+			return
 		}
 	}
 }
