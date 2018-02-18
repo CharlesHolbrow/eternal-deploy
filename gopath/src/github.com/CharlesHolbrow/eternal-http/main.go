@@ -24,7 +24,7 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("public")))
 	http.Handle("/ws", wsHandler)
 
-	addr := "127.0.0.1:5000"
+	addr := "0.0.0.0:5000"
 	log.Printf("Aether serving websockets with http on %s\n", addr)
 	http.ListenAndServe(addr, nil)
 }
