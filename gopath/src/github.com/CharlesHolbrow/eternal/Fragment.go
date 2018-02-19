@@ -6,43 +6,86 @@ import (
 
 // Fragment stores the contents of a subscription key
 type Fragment struct {
-	Notes    map[string]*Note
-	sKey     string
-	synkConn *synk.Synk
-	Mutator  synk.Mutator
+	Mutator synk.Mutator
+	sKey1   string
+	On      [128]*Note
 }
 
 // NewFragment - create a Fragment
-func NewFragment(key string, synkConn *synk.Synk) *Fragment {
-	mSynk := &synk.MongoSynk{
-		Coll:    synkConn.Mongo.Copy().DB("synk").C("objects"),
-		Creator: ConstructContainer,
-		RConn:   synkConn.Pool.Get(), // BUG(charles): this connection is never closed
-	}
+//
+// Requires a clean Mutator
+func NewFragment(k1 string, mutator synk.Mutator) *Fragment {
 
 	notes := &Fragment{
-		Notes:    make(map[string]*Note),
-		synkConn: synkConn,
-		sKey:     key,
-		Mutator:  mSynk,
+		sKey1:   k1,
+		Mutator: mutator,
 	}
 
-	objects, err := mSynk.Load([]string{key})
+	objects, err := notes.Mutator.Load([]string{k1})
 	if err != nil {
 		panic("Error initializing eternal Fragment: " + err.Error())
 	}
+
 	for _, obj := range objects {
 		if obj, ok := obj.(*Note); ok {
-			notes.Notes[obj.TagGetID()] = obj
+			if obj.Number < 0 || obj.Number > 127 {
+				mutator.Delete(obj)
+				continue
+			}
+			if notes.On[obj.Number] != nil {
+				mutator.Delete(obj)
+				continue
+			}
+			notes.On[obj.Number] = obj
 		}
 	}
 
 	return notes
 }
 
-// AddNote to the Part. The note's subscription key will be set
+// AddNote to the Fragment. The note's subscription key will be set.
+// No-op if we already have a note with n.Number
 func (frag *Fragment) AddNote(n *Note) {
-	n.SetSubKey(frag.sKey) // Ensure SubKey
+	// Ensure SubKey
+	if n.GetSubKey() == "" {
+		n.SetSubKey(frag.sKey1)
+	}
+
+	if frag.On[n.Number] != nil {
+		return
+	}
+
 	frag.Mutator.Create(n) // Ensures ID
-	frag.Notes[n.Key()] = n
+	frag.On[n.Number] = n
+}
+
+// RemoveNote removes any note in the fragment with number equal to n.Number
+func (frag *Fragment) RemoveNote(n *Note) {
+	if n.Number < 0 || n.Number > 127 {
+		return
+	}
+
+	removeMe := frag.On[n.Number]
+	if removeMe == nil {
+		return
+	}
+
+	frag.Mutator.Delete(removeMe)
+	frag.On[n.Number] = nil
+}
+
+// RemoveAllNotes is self explanitory
+func (frag *Fragment) RemoveAllNotes() {
+	for id, note := range frag.On {
+		if note == nil {
+			continue
+		}
+		frag.Mutator.Delete(note)
+		frag.On[id] = nil
+	}
+}
+
+// K1 Gets the first subscription key
+func (frag *Fragment) K1() string {
+	return frag.sKey1
 }

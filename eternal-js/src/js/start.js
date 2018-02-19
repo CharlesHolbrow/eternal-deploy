@@ -14,8 +14,11 @@ window.App = App;
 
 window.onload = () => {
   const app = window.app = new App();
+  let hash = window.location.hash;
 
-  app.synk.setSubscription(['eternal:main']);
+  if (!hash || hash === '') hash = 'main';
+
+  app.synk.setSubscription([`piano:${hash}`]);
   app.synk.resolve();
 };
 

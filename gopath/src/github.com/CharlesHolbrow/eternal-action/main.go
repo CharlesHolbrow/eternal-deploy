@@ -1,12 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"os"
-	"time"
 
 	"github.com/CharlesHolbrow/eternal"
 	"github.com/CharlesHolbrow/synk"
+	"github.com/garyburd/redigo/redis"
 )
 
 // By default, look for redis locally at ":6379". We may specify another host by
@@ -19,31 +21,53 @@ var redisAddr = os.Getenv("SYNK_REDIS_HOST") + ":6379"
 var env = os.Getenv("SYNK_ENV")
 
 func main() {
-	synkConn := synk.NewConnection(redisAddr)
 
-	part := eternal.NewFragment("eternal:main", synkConn)
-	fmt.Printf("Got %d objects\n", len(part.Notes))
+	node := eternal.NewNode()
+	mutator := node.CreateMutator()
+	fragment := eternal.NewFragment("piano:main", mutator)
+	fragment.RemoveAllNotes()
+	conn := synk.DialRedis()
 
-	// Create a new note
-	// part.AddNote(&eternal.Note{})
-	part.AddNote(&eternal.Note{})
-
-	// remove a random object
-	if len(part.Notes) > 3 {
-		for _, note := range part.Notes {
-			part.Mutator.Delete(note)
-			delete(part.Notes, note.TagGetID())
-			break
-		}
+	rSubscription := redis.PubSubConn{Conn: conn}
+	err := rSubscription.Subscribe("piano")
+	if err != nil {
+		log.Panicln("Error subscribing to piano")
 	}
 
 	for {
-		for _, n := range part.Notes {
-			fmt.Printf("Num: %d\tVel: %d\n", n.GetNumber(), n.GetVelocity())
-			n.SetNumber((n.GetNumber() + 1) % 128)
-			// synkConn.Modify(n)
-			part.Mutator.Modify(n)
-			time.Sleep(time.Second)
+		switch v := rSubscription.Receive().(type) {
+		case redis.Message:
+			event := &eternal.NoteEvent{}
+			if err := json.Unmarshal(v.Data, event); err == nil {
+				fmt.Println("Recived:", event.String())
+				note := &eternal.Note{
+					Number:   event.N,
+					Velocity: event.V,
+				}
+				if event.On {
+					fragment.AddNote(note)
+				} else {
+					fragment.RemoveNote(note)
+				}
+			} else {
+				fmt.Printf("Got Bad NoteEvent message from client: %s\n", v.Data)
+			}
+		case redis.Subscription:
+			// Redis is confirming our subscription v.Channel, v.Kind, v.Count
+		case error:
+			log.Println("eternal-action: Subscription receive error:", v)
+			return
 		}
 	}
+
+	// for {
+	// 	n := &eternal.Note{Number: 64, Velocity: 64}
+	// 	fragment.AddNote(n)
+	// 	time.Sleep(time.Second)
+	// 	n2 := &eternal.Note{Number: 65, Velocity: 127}
+	// 	fragment.AddNote(n2)
+	// 	time.Sleep(time.Second)
+	// 	fragment.RemoveAllNotes()
+	// 	time.Sleep(time.Second)
+	// }
 }

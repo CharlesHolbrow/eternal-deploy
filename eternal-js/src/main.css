@@ -1,11 +1,29 @@
-html, div {padding: 0; margin: 0}
-
+/* Prevent us from being able to scroll past the end of the page */
 html {
-  /* Prevent us from being able to scroll past the end of
-  the page */
-  /* overflow: hidden; */
+  overflow: hidden;
+}
+
+html, body, div {
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
 }
 
 #root {
-  color: #08007E;
+  color: rgb(255, 52, 52);
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+  height: 100%;
+  background-color: black;
+}
+
+.note {
+  flex-grow: 1;
+  transition-property: background-color, flex-grow;
+  transition-duration: 1000ms;
 }
