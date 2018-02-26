@@ -14,7 +14,7 @@ type Client struct {
 
 // OnConnect is called when client connects via WebSocket
 func (cc Client) OnConnect(client *synk.Client) {
-	log.Println("Custom Client Connected:", client.ID)
+	log.Println("Custom Client Connected:", client.ID())
 }
 
 // OnMessage is called when the client sends a message
