@@ -1,14 +1,15 @@
-**.DS_Store
+# Everything in gopath, except src/
 gopath/*
 !gopath/src
+
+# everything in src, except eternal stuff
 gopath/src/*
-!gopath/src/github.com
-gopath/src/github.com/*
-!gopath/src/github.com/CharlesHolbrow
-gopath/src/github.com/CharlesHolbrow/*
-!gopath/src/github.com/CharlesHolbrow/eternal
-!gopath/src/github.com/CharlesHolbrow/eternal-http
-!gopath/src/github.com/CharlesHolbrow/eternal-action
+!gopath/src/eternal-*
+
+# things used during build
 .vscode/
 certbot/
 nginx/nginx.conf
+
+# silly osx
+**.DS_Store

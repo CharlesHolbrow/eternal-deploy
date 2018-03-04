@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/CharlesHolbrow/eternal"
+  packages = ["."]
+  revision = "71550d1d267583f2ec4f10ccf3b9d8979b8f0242"
+  version = "v0.1.0"
+
+[[projects]]
   name = "github.com/CharlesHolbrow/pubsub"
   packages = ["."]
   revision = "5349a146d97f5a393e9c76eccd1201417cb564e3"
@@ -43,6 +49,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a54fda6441e4d84640b73725a9071f7a1242f9a7d83eb3d3683c20d4edfdcd8d"
+  inputs-digest = "88a4530685ee51644387075c0b13a1a5dd2d05d77c3b4c9ba1a8eec277ffbe07"
   solver-name = "gps-cdcl"
   solver-version = 1
