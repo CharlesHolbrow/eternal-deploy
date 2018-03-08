@@ -5,28 +5,29 @@ SOURCES = $(shell find . -name \*.go)
 # Go 
 DEPS := Gopkg.lock Gopkg.toml
 
-# image repository 
+# Image repository (inc. trailing slash)
 REPO := gcr.io/pixelaether/
 # The name of the current diretory
 NAME := $(shell basename $$PWD)
+# Branch name
+BRANCH := $(shell git describe)
 # Image tag
-TAG := $(REPO)$(NAME):$(shell git describe)
+TAG := $(REPO)$(NAME):$(BRANCH)
 
 .PHONY: image push
 
 # Abort if there we are not on a tagged commit
 image: build/$(NAME)
 	(git describe || (echo "Fatal. no annotated tags" && exit 1 ))  2>/dev/null && \
-	docker build -t $(NAME):$$(git describe) ./build
+	docker build -t $(TAG) ./build
+	@echo "Branch:   $(BRANCH)"
+	@echo "Building: $(TAG)"
 
 push: image
 	if [[ `git status --porcelain` ]]; \
-	then echo "working directory not clean"; \
-	else \
-	echo push $(TAG); \
-	fi
+then echo "working directory not clean"; \
+else gcloud docker -- push $(TAG); fi;
 
-	# if [[ ]] gcloud docker -- push &(TAG)
 
 build/$(NAME): $(DEPS) $(SOURCES) build
 	dep ensure && \
