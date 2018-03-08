@@ -5,8 +5,8 @@
   "main": "dist/app.bundle.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:prod": "export ENV=prod; webpack",
-    "build:dev": "export ENV=dev; webpack --display-error-details",
+    "build:prod": "export ENV=prod; webpack && rm -rf docker/public && cp -r production docker/public/",
+    "build:dev": "export ENV=dev; webpack --display-error-details && rm -rf docker/public && cp -r development docker/public/",
     "watch": "export ENV=dev; webpack --watch",
     "start": "export ENV=dev; webpack-dev-server --open"
   },
