@@ -1,7 +1,7 @@
 # To export GOPATH run:
 # $ source gopath.sh
 
-export GOPATH=$(pwd)/gopath
+export GOPATH=$(pwd)/go
 export PATH=$PATH:$GOPATH/bin
 
 echo "export GOPATH=${GOPATH}"

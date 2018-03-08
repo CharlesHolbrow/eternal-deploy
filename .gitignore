@@ -1,10 +1,10 @@
 # Everything in gopath, except src/
-gopath/*
-!gopath/src
+go/*
+!go/src
 
 # everything in src, except eternal stuff
-gopath/src/*
-!gopath/src/eternal-*
+go/src/*
+!go/src/eternal-*
 
 # things used during build
 .vscode/
