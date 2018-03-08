@@ -2,8 +2,8 @@
 # creating a docker image, and pushing that docker image to a docker repository.
 #
 # You should not need to edit this file before copying it to a new directory for
-# use in another project. The new project will need a `build/` direcotory with a
-# dedicated `Dockerfile`.
+# use in another project. The new project will need a `docker/` direcotory with
+# a dedicated `Dockerfile`.
 
 SHELL := /bin/bash
 
@@ -25,9 +25,9 @@ DEPS := Gopkg.lock Gopkg.toml
 .PHONY: image push
 
 # Abort if there are no taged commits.
-image: build/$(NAME)
+image: docker/$(NAME)
 	(git describe || (echo "Fatal. no annotated tags" && exit 1 ))  2>/dev/null && \
-	docker build -t $(TAG) ./build
+	docker build -t $(TAG) ./docker
 	@echo "Branch:   $(BRANCH)"
 	@echo "Building: $(TAG)"
 
@@ -37,9 +37,9 @@ then echo "working directory not clean"; \
 else gcloud docker -- push $(TAG); fi;
 
 # This is the go executable.
-build/$(NAME): $(DEPS) $(SOURCES)
+docker/$(NAME): $(DEPS) $(SOURCES)
 	dep ensure && \
-	env GOOS=linux GOARCH=amd64 go build -o build/$(NAME)
+	env GOOS=linux GOARCH=amd64 go build -o docker/$(NAME)
 
 debug:
 	@echo "REPO: $(REPO)"
