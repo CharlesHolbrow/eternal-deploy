@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: ReplicaSet
+metadata:
+  labels:
+    name: redis
+  name: redis-controller
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:4.0.8-alpine
+          args:
+            - redis-server
+            - /conf/redis.conf
+          ports:
+            - containerPort: 6379
+              name: redis
+              protocol: TCP
+          volumeMounts:
+            - name: redis-config-volume
+              mountPath: /conf
+      volumes:
+        - name: redis-config-volume
+          configMap:
+            name: redisconf
+

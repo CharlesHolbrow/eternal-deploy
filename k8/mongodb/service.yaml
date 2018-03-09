@@ -1,0 +1,13 @@
+# This exposes mongodb inside the cluster
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: mongo
+  name: mongo
+spec:
+  ports:
+    - port: 27017 # service available here
+      targetPort: 27017 # access this port inside the pod
+  selector:
+    name: mongo
