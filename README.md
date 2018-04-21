@@ -7,37 +7,20 @@ production.
 
 It is simple to run locally without `https://` and `nginx`.
 
-1. Make sure redis is running
-1. `cd` into the root of this repository -- this ensures that eternal-http knows where to find static files
-1. `go install` and run `eternal-http` and `eternal-action`. This can be simplified by exporting the `$GOPATH` var with the included script `$ source GOPATH.sh`
+1. Make sure 'redis' and 'mongodb' are running
+1. Run `./gopath.sh` from the repository root
+1. for `eternal-ws` and `eternal-action`, do the following:
+    - cd into the correct dir
+    - `$ dep ensure && go install`
+1. cd into eternal-static
+1. `$ make prod` or `$ make dev`
+1. cd into docker (so that there is a `public/` dir in working directory)
+1. run `$ eternal-ws`
+1. in another tab run `$ eternal-action`
 
-`eternal-http` serves on port `127.0.0.1:5000`
+## How to sable transparent huge pages
 
-## Deploying To Production
-
-### Requirements
-
-- install git, make, go, nginx, redis-server, certbot
-
-### Install
-
-It is expected that this be installed at `/synk`
-
-`git clone git@github.com:CharlesHolbrow/eternal.git /synk`
-
-1. `go install` `eternal-action` and `eternal-http`.
-    - see `source gopath.sh` for assistance
-1. setup iptables for port forwarding:
-    - port 3000 for http
-    - port 3001 for https
-
-Below are useful `make` targets for deploying. These are approximately the order
-to install with.
-
-- `make dev-certificate` create temporary certificate so nginx doesn't complain
-- `make nginx-install` or `make nginx-install HTTPS_REDIRECT=your.host.name` To create the nginx `.conf` file, move it into place, and restart nginx.
-- `make prod-certificate` create production certificates for nginx
-- `make services` this will enable and restart the systemd services
+In production, consider these:
 
 The following lines can be added to `/etc/rc.local`:
 
@@ -46,16 +29,4 @@ The following lines can be added to `/etc/rc.local`:
 echo never > /sys/kernel/mm/transparent_hugepage/enabled
 # Charles - another change for redis
 sysctl -w net.core.somaxconn=65535
-# Forwarding for aether in production
-iptables -t nat -A PREROUTING -i ens32 -p tcp --dport 80 -j REDIRECT --to-port 3000
-iptables -t nat -A PREROUTING -i ens32 -p tcp --dport 443 -j REDIRECT --to-port 3001
 ```
-
-## Building eternal-js
-
-Requirements:
-
-- npm (used to fetch dependencies)
-
-`$ make dev-client` or `$ make prod-client` will invoke the aether-js makefile,
-and copy the result to the aether-http public folder.

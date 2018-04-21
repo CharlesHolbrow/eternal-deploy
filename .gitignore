@@ -8,8 +8,6 @@ go/src/*
 
 # things used during build
 .vscode/
-certbot/
-nginx/nginx.conf
 
 # silly osx
 **.DS_Store
