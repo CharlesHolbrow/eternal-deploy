@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
       - name: eternal-http
-        image:  gcr.io/pixelaether/eternal-js:v0.0.1-rc1-9-gdf6f549
+        image:  gcr.io/pixelaether/eternal-static:v0.0.1-rc2
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80

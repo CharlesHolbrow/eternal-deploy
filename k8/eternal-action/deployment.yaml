@@ -6,16 +6,15 @@ metadata:
   creationTimestamp: null
   generation: 1
   labels:
-    run: eternal-ws
-  name: eternal-ws
-  selfLink: /apis/extensions/v1beta1/namespaces/charles/deployments/eternal-ws
+    run: eternal-action
+  name: eternal-action
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      run: eternal-ws
+      run: eternal-action
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -25,11 +24,11 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        run: eternal-ws
+        run: eternal-action
     spec:
       containers:
-      - name: eternal-ws
-        image: gcr.io/pixelaether/eternal-ws:v0.0.1-rc2
+      - name: eternal-action
+        image: gcr.io/pixelaether/eternal-action:v0.0.1-rc2
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
@@ -40,9 +39,6 @@ spec:
             secretKeyRef:
               name: synk
               key: pass
-        ports:
-        - containerPort: 5000
-          protocol: TCP
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File

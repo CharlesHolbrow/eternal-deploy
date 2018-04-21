@@ -34,7 +34,10 @@ image: docker/$(NAME)
 push: image
 	if [[ `git status --porcelain` ]]; \
 then echo "working directory not clean"; \
-else gcloud docker -- push $(TAG); fi;
+else docker push $(TAG); fi;
+
+force-push: image
+	docker push $(TAG)
 
 # This is the go executable.
 docker/$(NAME): $(DEPS) $(SOURCES)
