@@ -1,0 +1,38 @@
+# to update, use:
+# $ kubectl replace -f ingress.yaml
+#
+# Note that deleting and re-creating will eliminate the static ip assignment in
+# google cloud
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: eternal
+  namespace: charles
+  annotations:
+    # Which ingress controller is this ingress for? options: "gce", "nginx"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  # # Specify a backend if you have a single service
+  # backend:
+  #   serviceName: junk
+  #   servicePort: 80
+  tls:
+  - secretName: eternal-certs
+    hosts:
+    - xtc.world
+    - xct.world
+    - x7.world
+    - xys.world
+  rules:
+  - host: x7.world
+    http:
+      paths:
+      # When this path is matched by nginx, send the request to the named service
+      - path: /
+        backend:
+          serviceName: eternal-static
+          servicePort: 80
+      - path: /ws
+        backend:
+          serviceName: eternal-ws
+          servicePort: 80

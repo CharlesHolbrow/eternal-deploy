@@ -3,16 +3,15 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    run: eternal-http
-  name: eternal-http
-  selfLink: /api/v1/namespaces/charles/services/eternal-http
+    run: eternal-ws
+  name: eternal-ws
 spec:
   ports:
   - port: 80
     protocol: TCP
     targetPort: 5000
   selector:
-    run: eternal-http
+    run: eternal-ws
   sessionAffinity: None
   type: ClusterIP
 status:

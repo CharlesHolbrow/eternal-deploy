@@ -3,19 +3,17 @@ kind: Deployment
 metadata:
   annotations:
     deployment.kubernetes.io/revision: "1"
-  creationTimestamp: null
   generation: 1
   labels:
-    run: eternal-http
-  name: eternal-http
-  selfLink: /apis/extensions/v1beta1/namespaces/charles/deployments/eternal-http
+    run: eternal-static
+  name: eternal-static
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      run: eternal-http
+      run: eternal-static
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -25,30 +23,19 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        run: eternal-http
+        run: eternal-static
     spec:
       containers:
-      - image: gcr.io/pixelaether/eternal-http:v0.0.1-rc2
-        # command: ['env']
-        envFrom:
-        - configMapRef:
-            name: synk
-        env:
-        - name: SYNK_MONGO_PASS
-          valueFrom:
-            secretKeyRef:
-              name: synk
-              key: pass
+      - name: eternal-http
+        image:  gcr.io/pixelaether/eternal-js:v0.0.1-rc1-9-gdf6f549
         imagePullPolicy: IfNotPresent
-        name: eternal-http
         ports:
-        - containerPort: 5000
+        - containerPort: 80
           protocol: TCP
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
       dnsPolicy: ClusterFirst
       restartPolicy: Always
-      schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30

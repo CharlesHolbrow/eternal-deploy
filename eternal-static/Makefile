@@ -26,6 +26,9 @@ push: image
 then echo "working directory not clean"; \
 else gcloud docker -- push $(TAG); fi;
 
+force-push: image
+	docker push $(TAG)
+
 prod:
 	npm run build:prod
 
