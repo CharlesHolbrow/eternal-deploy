@@ -16,7 +16,9 @@ var env = os.Getenv("SYNK_ENV")
 
 func main() {
 
-	node := eternal.NewNode()
+	node := synk.NewNode()
+	node.RegisterClientConstructor(eternal.ConstructClient)
+	node.RegisterContainerConstructor(eternal.ConstructContainer)
 	wsHandler := synk.NewHandler(node)
 
 	// In production we will serve the public directory with nginx. However,
@@ -24,7 +26,14 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("public")))
 	http.Handle("/ws", wsHandler)
 
-	addr := "0.0.0.0:5000"
+	var addr string
+
+	if env == "" {
+		addr = "127.0.0.1:5000"
+	} else {
+		addr = "0.0.0.0:5000"
+	}
+
 	log.Printf("Aether serving websockets with http on %s\n", addr)
 	http.ListenAndServe(addr, nil)
 }

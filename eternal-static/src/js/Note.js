@@ -5,8 +5,9 @@ export default class Note {
   /**
    * @param {string} key - provided by synk server
    * @param {object} state - initial state provided by synk server
+   * @param {object} synkObjects - the collection of all synk objects
    */
-  constructor(key, state, synkObjects) {
+  constructor(key, state) {
     this.element = document.createElement('div');
     this.elementPre = document.createElement('pre');
     this.element.appendChild(this.elementPre);
@@ -42,8 +43,7 @@ export default class Note {
     if (state.hasOwnProperty('number')) this.number = state.number;
 
     // update text
-    const json = JSON.stringify(this.state, null, '  ');
-
+    // const json = JSON.stringify(this.state, null, '  ');
     // this.elementCode.innerText = `${json}\n${this.color}`;
   }
 
@@ -73,6 +73,9 @@ export default class Note {
     this.element.style.backgroundColor = color;
   }
 
+  /**
+   * @return {color} - background color
+   */
   get color() {
     return this.element.style.backgroundColor;
   }

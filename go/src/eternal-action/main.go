@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"image"
 	"log"
+	"math/rand"
 	"os"
 
 	"github.com/CharlesHolbrow/eternal"
@@ -22,11 +24,27 @@ var env = os.Getenv("SYNK_ENV")
 
 func main() {
 
-	node := eternal.NewNode()
+	node := synk.NewNode()
+	node.RegisterClientConstructor(eternal.ConstructClient)
+	node.RegisterContainerConstructor(eternal.ConstructContainer)
+
 	mutator := node.CreateMutator()
-	fragment := eternal.NewFragment("piano:main", mutator)
+	fragment := eternal.NewFragment("snd:a", image.Rect(-2, -2, 3, 3), mutator)
 	fragment.RemoveAllNotes()
 	conn := synk.DialRedis()
+
+	// Make sure there is at least one Cell
+	cell := &eternal.Cell{
+		X: rand.Intn(6) * -1,
+		Y: rand.Intn(6) * -1,
+	}
+	fmt.Printf("Cell:%v\n", cell)
+	if len(fragment.Cells) > 5 {
+		for _, cell := range fragment.Cells {
+			fragment.RemoveCell(cell)
+		}
+	}
+	fragment.AddCell(cell)
 
 	rSubscription := redis.PubSubConn{Conn: conn}
 	err := rSubscription.Subscribe("piano")
