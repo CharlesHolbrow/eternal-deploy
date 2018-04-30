@@ -44,7 +44,9 @@ func main() {
 			fragment.RemoveCell(cell)
 		}
 	}
-	fragment.AddCell(cell)
+	for _, cell := range cells() {
+		fragment.AddCell(cell)
+	}
 
 	rSubscription := redis.PubSubConn{Conn: conn}
 	err := rSubscription.Subscribe("piano")
