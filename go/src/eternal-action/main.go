@@ -57,7 +57,7 @@ func main() {
 		}
 	}()
 
-	ticker := time.NewTicker(time.Millisecond * 1500)
+	ticker := time.NewTicker(time.Millisecond * 4500)
 
 	for {
 		select {
@@ -86,26 +86,28 @@ func main() {
 				return
 			}
 		case <-ticker.C:
-			n := rand.Intn(len(fragment.Cells))
-			var randomCell *eternal.Cell
-			i := 0
-			for _, cell := range fragment.Cells {
-				if i <= n {
-					randomCell = cell
-					break
+			for repeat := 0; repeat < 5; repeat++ {
+				n := rand.Intn(len(fragment.Cells))
+				var randomCell *eternal.Cell
+				i := 0
+				for _, cell := range fragment.Cells {
+					if i <= n {
+						randomCell = cell
+						break
+					}
+					i++
 				}
-				i++
-			}
-			// randomCell.SetHue(rand.Float32())
-			if rand.Intn(2) == 0 {
-				randomCell.SetY(randomCell.GetY() + rand.Intn(3) - 1)
-			} else {
-				randomCell.SetX(randomCell.GetX() + rand.Intn(3) - 1)
-			}
-			if err := mutator.Modify(randomCell); err != nil {
-				log.Println("error mutating cell:", randomCell.AudioPath, err.Error())
-			} else {
-				log.Println("mutated:", randomCell.AudioPath)
+				// randomCell.SetHue(rand.Float32())
+				if rand.Intn(2) == 0 {
+					randomCell.SetY(randomCell.GetY() + rand.Intn(3) - 1)
+				} else {
+					randomCell.SetX(randomCell.GetX() + rand.Intn(3) - 1)
+				}
+				if err := mutator.Modify(randomCell); err != nil {
+					log.Println("error mutating cell:", randomCell.AudioPath, err.Error())
+				} else {
+					log.Println("mutated:", randomCell.AudioPath)
+				}
 			}
 		}
 	}
