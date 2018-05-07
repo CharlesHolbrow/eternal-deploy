@@ -2,43 +2,139 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/url"
+	"path"
+	"strings"
 
 	"github.com/CharlesHolbrow/eternal"
 )
 
-var melodyFilenames = []string{"mel-000.wav", "mel-001.wav", "mel-002.wav", "mel-003.wav", "mel-004.wav", "mel-005.wav", "mel-006.wav", "mel-007.wav", "mel-008.wav", "mel-009.wav", "mel-010.wav", "mel-011.wav", "mel-012.wav", "mel-013.wav", "mel-014.wav", "mel-015.wav", "mel-016.wav", "mel-017.wav", "mel-018.wav", "mel-019.wav"}
-var lucernFilenames = []string{"005_SingingPerformance_Lucern.wav", "03-Cows.wav", "04-Cows.wav", "04-Market Texture.wav", "04-Nature.wav", "05-Child and Fountain in the Market.wav", "06-City Bells and Street Sounds - Very Nice-001.wav", "07-Child Street.wav", "07-StreamClose.wav", "099_DoorsClosingClicksAndBeeps_Lucern.wav", "107-Exaggerated Bridge 1shot.wav", "112-Exaggerated Bridge Footsteps.wav", "122-Cowbell-1shot.wav", "125-Cowbell-1shot.wav", "1C-LucerneOrchestraSession-August26-2014_tense.wav", "bridgeWalk2_seagulls_2.wav", "bridge_walk2_seagull_2.wav", "crew_creaky_2.wav", "crew_hardPulls_1.wav", "crew_heavyPulls_calmInstructions.wav", "crew_quickPulls.wav", "day#5_bell_water_1.wav", "day#5_bell_water_7.wav", "day#5_boat_docking_5.wav", "day#5_boat_horn.wav", "day#5_boat_waterWheel2_1.wav", "day#5_passingCar_windy_1.wav", "day#5_waterLapping.wav", "exploringRainy_flag_umbrella_.wav", "exploringRainy_rollingSuitcase.wav", "exploring_steps_humming.wav", "exploring_waterClose_color2.wav", "exploring_waterClose_subside_1.wav", "exploring_water_metalKnocks_1.wav", "kkl_duetVocal.wav", "organTour_creakySteps_1.wav", "organTour_intro.wav", "organTour_murmurs_breathing.wav", "organ_arpeggio_13.wav", "organ_pedalBuilding.wav", "organ_softResolution.wav", "streetStudio_convo1_skateboard.wav"}
+var thirds []string
+var usedPositions = make(map[string]bool)
 
-func prefixFileNames(prefix string, filenames []string) []string {
-	output := make([]string, len(filenames))
-	for i, fn := range filenames {
-		t := &url.URL{Path: prefix + fn}
-		output[i] = t.String()
+func usePosition(x, y int) (ok bool) {
+	name := fmt.Sprintf("%d,%d", x, y)
+
+	if usedPositions[name] {
+		return false
+	}
+
+	usedPositions[name] = true
+	return true
+}
+
+// find and use the first available y for a given int
+func useFirstYForX(x, yCheck int) (y int) {
+	for {
+		if usePosition(x, yCheck) {
+			return yCheck
+		}
+		yCheck++
+	}
+}
+
+// get all the audio files in public/dir, where `dir` is the argument
+func findFilenames(dir string) []string {
+	files, err := ioutil.ReadDir(path.Join("./public", dir))
+	if err != nil {
+		log.Fatal(err)
+	}
+	output := make([]string, 0, len(files))
+	for _, file := range files {
+		cellPath := path.Join(dir, file.Name())
+		// BUG(charles): this is case sensitive. It probably should not be.
+		if strings.HasSuffix(cellPath, ".wav") || strings.HasSuffix(cellPath, ".mp3") {
+			u := url.URL{Path: cellPath}
+			output = append(output, u.String())
+		}
 	}
 	return output
 }
 
+// The filename format for the guitar 10ths is "A2-min-001.wav". Split the
+// filename into three separate parts, removing the directory if needed.
+func parseThirds(filepath string) (a, b, c string) {
+	_, filename := path.Split(filepath)
+	dotPosition := strings.LastIndex(filename, ".")
+	noExtension := filename[:dotPosition]
+
+	parts := strings.Split(noExtension, "-")
+	if len(parts) >= 1 {
+		a = parts[0]
+	}
+	if len(parts) >= 2 {
+		b = parts[1]
+	}
+	if len(parts) >= 3 {
+		c = parts[2]
+	}
+	return
+}
+
+func sciPitchToXPos(pitch string) (x int) {
+	switch strings.ToLower(pitch) {
+	case "a2":
+		x = 0
+	case "b2":
+		x = 1
+	case "c3":
+		x = 2
+	case "d3":
+		x = 3
+	case "e3":
+		x = 4
+	case "fs3":
+		x = 5
+	case "g3":
+		x = 6
+	case "a3":
+		x = 7
+	default:
+		x = -2
+	}
+	return x
+}
+
+func cellsThirds() []*eternal.Cell {
+	paths := findFilenames("sound/g-3rd")
+	result := make([]*eternal.Cell, 0, len(paths))
+	for _, fn := range paths {
+		p, _, _ := parseThirds(fn)
+
+		x := sciPitchToXPos(p)
+		y := useFirstYForX(x, 0)
+		// hue is brittle, because it depends on x, y starting from 0
+		hue := (float32(x) * 0.1) + (float32(y) * .02)
+
+		cell := &eternal.Cell{
+			X:         x,
+			Y:         y,
+			AudioPath: fn,
+			Hue:       hue,
+			Class:     "g-3rd",
+		}
+		usePosition(cell.X, cell.Y)
+		result = append(result, cell)
+	}
+
+	return result
+}
+
 func cells() []*eternal.Cell {
 
-	melodyPaths := prefixFileNames("sound/m/", melodyFilenames)
-	lucernPaths := prefixFileNames("sound/l/selection/", lucernFilenames)
-	usedPositions := make(map[string]bool)
-
-	usePosition := func(x, y int) {
-		name := fmt.Sprintf("%d,%d", x, y)
-		usedPositions[name] = true
-	}
+	guitarPaths := findFilenames("sound/g-3rd")
+	lucernPaths := findFilenames("sound/l/selection/")
 
 	getPosition := func() (x, y int) { // Is the spot available?
 		for {
-			x = rand.Intn(16) - 8
-			y = rand.Intn(16) - 8
+			x = rand.Intn(24) - 12
+			y = rand.Intn(24) - 12
 
-			name := fmt.Sprintf("%d,%d", x, y)
-			if !usedPositions[name] {
-				usedPositions[name] = true
+			ok := usePosition(x, y)
+			if ok {
 				return x, y
 			}
 		}
@@ -46,19 +142,7 @@ func cells() []*eternal.Cell {
 
 	rand.Seed(4)
 
-	mCells := make([]*eternal.Cell, len(melodyPaths))
-	hue := float32(0.1)
-	for i, fn := range melodyPaths {
-		usePosition(i, 0)
-
-		mCells[i] = &eternal.Cell{
-			X:         i - 10,
-			Y:         0,
-			AudioPath: fn,
-			Hue:       hue,
-		}
-		hue += 0.05
-	}
+	mCells := make([]*eternal.Cell, len(guitarPaths))
 
 	lCells := make([]*eternal.Cell, len(lucernPaths))
 	for i, fn := range lucernPaths {
@@ -71,5 +155,6 @@ func cells() []*eternal.Cell {
 			Hue:       rand.Float32(),
 		}
 	}
-	return append(mCells, lCells...)
+	// return append(mCells, lCells...)
+	return mCells
 }

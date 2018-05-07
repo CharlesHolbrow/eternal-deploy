@@ -2,10 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"image"
 	"log"
-	"math/rand"
 	"os"
 	"time"
 
@@ -40,7 +38,7 @@ func main() {
 			fragment.RemoveCell(cell)
 		}
 	}
-	for _, cell := range cells() {
+	for _, cell := range cellsThirds() {
 		fragment.AddCell(cell)
 	}
 
@@ -57,27 +55,25 @@ func main() {
 		}
 	}()
 
-	ticker := time.NewTicker(time.Millisecond * 4500)
+	ticker := time.NewTicker(time.Second * 15)
 
 	for {
 		select {
 		case msg := <-fromRedis:
 			switch v := msg.(type) {
 			case redis.Message:
-				event := &eternal.NoteEvent{}
+				event := &eternal.MoveCellEvent{}
 				if err := json.Unmarshal(v.Data, event); err == nil {
-					fmt.Println("Recived:", event.String())
-					note := &eternal.Note{
-						Number:   event.N,
-						Velocity: event.V,
-					}
-					if event.On {
-						fragment.AddNote(note)
+					log.Println("Recived:", event.String())
+					if cell, ok := fragment.Cells[event.ID]; ok {
+						cell.SetX(event.X)
+						cell.SetY(event.Y)
+						mutator.Modify(cell)
 					} else {
-						fragment.RemoveNote(note)
+						log.Println("Failed to Unmarshall MoveCellEvent", err.Error())
 					}
 				} else {
-					fmt.Printf("Got Bad NoteEvent message from client: %s\n", v.Data)
+					log.Printf("Got Bad MoveCellEvent message from client: %s\n", v.Data)
 				}
 			case redis.Subscription:
 				// Redis is confirming our subscription v.Channel, v.Kind, v.Count
@@ -86,29 +82,18 @@ func main() {
 				return
 			}
 		case <-ticker.C:
-			for repeat := 0; repeat < 5; repeat++ {
-				n := rand.Intn(len(fragment.Cells))
-				var randomCell *eternal.Cell
-				i := 0
-				for _, cell := range fragment.Cells {
-					if i <= n {
-						randomCell = cell
-						break
-					}
-					i++
-				}
-				// randomCell.SetHue(rand.Float32())
-				if rand.Intn(2) == 0 {
-					randomCell.SetY(randomCell.GetY() + rand.Intn(3) - 1)
-				} else {
-					randomCell.SetX(randomCell.GetX() + rand.Intn(3) - 1)
-				}
-				if err := mutator.Modify(randomCell); err != nil {
-					log.Println("error mutating cell:", randomCell.AudioPath, err.Error())
-				} else {
-					log.Println("mutated:", randomCell.AudioPath)
-				}
-			}
+			// for repeat := 0; repeat < 5; repeat++ {
+			// 	n := rand.Intn(len(fragment.Cells))
+			// 	var randomCell *eternal.Cell
+			// 	i := 0
+			// 	for _, cell := range fragment.Cells {
+			// 		if i <= n {
+			// 			randomCell = cell
+			// 			break
+			// 		}
+			// 		i++
+			// 	}
+			// }
 		}
 	}
 
