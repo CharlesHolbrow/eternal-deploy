@@ -27,11 +27,11 @@
 
 [[constraint]]
   name = "github.com/CharlesHolbrow/eternal"
-  version = "0.1.1"
+  version = "^0.3.0-rc.2"
 
 [[constraint]]
   name = "github.com/CharlesHolbrow/synk"
-  version = "0.2.0"
+  version = "^0.3.0-rc.1"
 
 [prune]
   go-tests = true

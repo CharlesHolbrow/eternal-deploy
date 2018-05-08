@@ -4,8 +4,8 @@
 [[projects]]
   name = "github.com/CharlesHolbrow/eternal"
   packages = ["."]
-  revision = "ad794484f1b0f16121af865ddeaa3e51c36d4156"
-  version = "v0.1.1"
+  revision = "bef79f6a71d4376a089662c8bce6683816a7087f"
+  version = "v0.3.0-rc2"
 
 [[projects]]
   name = "github.com/CharlesHolbrow/pubsub"
@@ -16,8 +16,8 @@
 [[projects]]
   name = "github.com/CharlesHolbrow/synk"
   packages = ["."]
-  revision = "158d2eb2d9103157307bca6155563fd22641d109"
-  version = "v0.2.0"
+  revision = "ae5636efcb1c0e434f1daf9e40f1b69c5df5676a"
+  version = "v0.3.0-rc.1"
 
 [[projects]]
   name = "github.com/garyburd/redigo"
@@ -49,6 +49,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "0418ca650aa853a0b495d1d70ac15d51978826a2cde57e4f04f2696676e2d362"
+  inputs-digest = "5ebfba21af54efa443febdde6cce2d2b3daab64307b1512d9e5574aede89213b"
   solver-name = "gps-cdcl"
   solver-version = 1

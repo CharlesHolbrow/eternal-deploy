@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"net/url"
 	"path"
 	"strings"
@@ -74,40 +73,53 @@ func parseThirds(filepath string) (a, b, c string) {
 	return
 }
 
-func sciPitchToXPos(pitch string) (x int) {
+// scientific pitch notation:
+// c4 = 60
+// c3 = 48, d3 = 50, e3 = 52, f3 = 53, g3 = 55, a3 = 57, b3 = 49
+// c2 = 36, d2 = 38, e2 = 40, f2 = 41, g2 = 43, a2 = 45, b2 = 47
+func sciPitchToXPosAndMidiNumber(pitch string) (x int, note int) {
 	switch strings.ToLower(pitch) {
 	case "a2":
 		x = 0
+		note = 45
 	case "b2":
 		x = 1
+		note = 47
 	case "c3":
 		x = 2
+		note = 48
 	case "d3":
 		x = 3
+		note = 50
 	case "e3":
 		x = 4
+		note = 52
 	case "fs3":
 		x = 5
+		note = 54
 	case "g3":
 		x = 6
+		note = 55
 	case "a3":
 		x = 7
+		note = 57
 	default:
 		x = -2
+		note = -1
 	}
-	return x
+	return x, note
 }
 
 func cellsThirds() []*eternal.Cell {
-	paths := findFilenames("sound/g-3rd")
+	paths := findFilenames("sound/g-3rd-mp3")
 	result := make([]*eternal.Cell, 0, len(paths))
 	for _, fn := range paths {
 		p, _, _ := parseThirds(fn)
 
-		x := sciPitchToXPos(p)
+		x, midiNote := sciPitchToXPosAndMidiNumber(p)
 		y := useFirstYForX(x, 0)
 		// hue is brittle, because it depends on x, y starting from 0
-		hue := (float32(x) * 0.1) + (float32(y) * .02)
+		hue := (float32(x) * 0.13) + (float32(y) * .001)
 
 		cell := &eternal.Cell{
 			X:         x,
@@ -115,46 +127,11 @@ func cellsThirds() []*eternal.Cell {
 			AudioPath: fn,
 			Hue:       hue,
 			Class:     "g-3rd",
+			MidiNote:  midiNote,
 		}
 		usePosition(cell.X, cell.Y)
 		result = append(result, cell)
 	}
 
 	return result
-}
-
-func cells() []*eternal.Cell {
-
-	guitarPaths := findFilenames("sound/g-3rd")
-	lucernPaths := findFilenames("sound/l/selection/")
-
-	getPosition := func() (x, y int) { // Is the spot available?
-		for {
-			x = rand.Intn(24) - 12
-			y = rand.Intn(24) - 12
-
-			ok := usePosition(x, y)
-			if ok {
-				return x, y
-			}
-		}
-	}
-
-	rand.Seed(4)
-
-	mCells := make([]*eternal.Cell, len(guitarPaths))
-
-	lCells := make([]*eternal.Cell, len(lucernPaths))
-	for i, fn := range lucernPaths {
-		x, y := getPosition()
-
-		lCells[i] = &eternal.Cell{
-			X:         x,
-			Y:         y,
-			AudioPath: fn,
-			Hue:       rand.Float32(),
-		}
-	}
-	// return append(mCells, lCells...)
-	return mCells
 }
