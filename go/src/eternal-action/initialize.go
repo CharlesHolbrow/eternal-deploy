@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -134,4 +135,41 @@ func cellsThirds() []*eternal.Cell {
 	}
 
 	return result
+}
+
+func writeCellsJSON(cells []*eternal.Cell) {
+	if len(cells) == 0 {
+		log.Println("writeCellsJSON: cells is nil or empty!")
+	}
+
+	data, err := json.Marshal(cells)
+	if err != nil {
+		log.Println("writeCellsJSON: failed to convert cells to JSON:", err.Error())
+	}
+
+	err = ioutil.WriteFile("cells.json", data, 0644)
+	if err != nil {
+		log.Println("writeCellsJSON: failed to write file:", err.Error())
+	}
+}
+
+// Try to get the cells to init the DB.
+// - First look in cells.json
+// - Then try to read from public directory
+func getInitialCells() (cells []*eternal.Cell, err error) {
+	// first look for cells.json
+	if data, err := ioutil.ReadFile("cells.json"); err != nil {
+		log.Println("Couldn't read cells.json")
+	} else {
+		if jsonErr := json.Unmarshal(data, &cells); jsonErr != nil {
+			log.Println("Couldn't unmarshall cells.json", jsonErr.Error())
+		} else {
+			log.Printf("Got %d files from cells.json\n", len(cells))
+			return cells, nil
+		}
+	}
+
+	// note that cellsThirds() may panic on failure
+	log.Println("Trying to get cells from files..")
+	return cellsThirds(), nil
 }

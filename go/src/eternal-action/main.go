@@ -23,6 +23,10 @@ var env = os.Getenv("SYNK_ENV")
 
 func main() {
 
+	if env == "" {
+		env = "development"
+	}
+
 	node := synk.NewNode()
 	node.RegisterClientConstructor(eternal.ConstructClient)
 	node.RegisterContainerConstructor(eternal.ConstructContainer)
@@ -32,14 +36,28 @@ func main() {
 	fragment.RemoveAllNotes()
 	conn := synk.DialRedis()
 
-	// Make sure there is at least one Cell
-	if len(fragment.Cells) > 5 {
-		for _, cell := range fragment.Cells {
-			fragment.RemoveCell(cell)
+	// In development, if there are only a few cells, clear them
+	if env == "development" {
+		if len(fragment.Cells) > 5 || env == "" {
+			for _, cell := range fragment.Cells {
+				fragment.RemoveCell(cell)
+			}
 		}
 	}
-	for _, cell := range cellsThirds() {
-		fragment.AddCell(cell)
+
+	// Try to populate cells if there are none
+	if len(fragment.Cells) == 0 {
+		cells, err := getInitialCells()
+		if err != nil {
+			log.Panicln("Error trying to get initial Cells:", err.Error())
+		}
+
+		for _, cell := range cells {
+			fragment.AddCell(cell)
+		}
+		if len(cells) > 0 {
+			writeCellsJSON(cells)
+		}
 	}
 
 	// Pump messages from redis to a channel
