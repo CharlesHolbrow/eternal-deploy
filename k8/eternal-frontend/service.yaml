@@ -3,15 +3,15 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    run: eternal-static
-  name: eternal-static
+    run: eternal-frontend
+  name: eternal-frontend
 spec:
   ports:
   - port: 80
     protocol: TCP
     targetPort: 80
   selector:
-    run: eternal-static
+    run: eternal-frontend
   sessionAffinity: None
   type: ClusterIP
 status:

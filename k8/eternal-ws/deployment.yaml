@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
       - name: eternal-ws
-        image: gcr.io/pixelaether/eternal-ws:v0.0.1-rc2
+        image: gcr.io/pixelaether/eternal-ws:v0.0.2
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
@@ -40,6 +40,8 @@ spec:
             secretKeyRef:
               name: synk
               key: pass
+        - name: SYNK_ENV
+          value: staging
         ports:
         - containerPort: 5000
           protocol: TCP

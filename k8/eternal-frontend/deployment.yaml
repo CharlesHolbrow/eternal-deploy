@@ -5,15 +5,15 @@ metadata:
     deployment.kubernetes.io/revision: "1"
   generation: 1
   labels:
-    run: eternal-static
-  name: eternal-static
+    run: eternal-frontend
+  name: eternal-frontend
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      run: eternal-static
+      run: eternal-frontend
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -23,11 +23,11 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        run: eternal-static
+        run: eternal-frontend
     spec:
       containers:
       - name: eternal-http
-        image:  gcr.io/pixelaether/eternal-static:v0.0.1-rc2
+        image:  gcr.io/pixelaether/eternal-frontend:v0.0.2
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80

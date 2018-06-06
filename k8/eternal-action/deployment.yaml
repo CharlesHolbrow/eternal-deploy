@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: eternal-action
-        image: gcr.io/pixelaether/eternal-action:v0.0.1-rc2
+        image: gcr.io/pixelaether/eternal-action:v0.0.2
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
@@ -39,6 +39,8 @@ spec:
             secretKeyRef:
               name: synk
               key: pass
+        - name: SYNK_ENV
+          value: staging
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File

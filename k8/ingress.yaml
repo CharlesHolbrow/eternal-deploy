@@ -30,7 +30,7 @@ spec:
       # When this path is matched by nginx, send the request to the named service
       - path: /
         backend:
-          serviceName: eternal-static
+          serviceName: eternal-frontend
           servicePort: 80
       - path: /ws
         backend:
