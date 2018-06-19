@@ -14,9 +14,9 @@ It is simple to run locally without `https://` and `nginx`.
     - `$ dep ensure && go install`
 1. cd into eternal-static
 1. `$ make prod` or `$ make dev`
-1. cd into docker (so that there is a `public/` dir in working directory)
+1. cd into `eternal-frontend/docker` (so that there is a `public/` dir in working directory)
 1. run `$ eternal-ws`
-1. in another tab run `$ eternal-action`
+1. in another tab run `$ eternal-action` (also beneath `public/` dir)
 
 ## How to sable transparent huge pages
 

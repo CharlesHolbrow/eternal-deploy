@@ -1,0 +1,128 @@
+<html>
+    <head>
+        <!-- <meta name="viewport" content="width=device-width"> -->
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+        <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'>
+        <style>
+            body {
+                background-color:grey;
+                padding: 0; /* may be unnecessary */
+                margin: 0;
+            }
+            div.outer {
+                /* overflow: scroll; */
+                /* background-color:cadetblue; */
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+            }
+            div.middle {
+                /* 1.73 is slightly less than sqrt(3) - so the total size
+                won't be larger than three times the size of the window, which
+                is appropriate for firefox. Firefox ignores will-change if the
+                size is larger than the surface area times 3. */
+                height: 173%;
+                width: 173%;
+                background: rgb(0,0,0);
+                background: radial-gradient(circle, rgba(255,0,0,1) 0%, rgba(70,102,252,1) 100%);
+                will-change: transform;
+                /* transition: transform 1s linear; */
+                transform: translate3d(0px, 0px, 0px);
+                position:relative;
+            }
+
+        </style>
+    </head>
+    <body>
+        <!-- <div style='border:dashed 4px blue'> -->
+            <div class='outer'>
+                <div class='middle'>
+                    hi this is a string of text that is fairly long, but does not go on forever. hihihih. 
+                </div>
+            <!-- </div> -->
+        </div>
+    </body>
+    <script>
+
+        // Split into chunk x, y
+        const chunkSize = 100;
+        const split = window.split = (i) => {
+            var chunk, pixel;
+            if (i < 0) {
+                chunk = Math.floor(i / chunkSize);
+                pixel = (i + Math.abs(chunk) * chunkSize) % chunkSize
+            } else {
+                chunk = Math.floor(i / chunkSize);
+                pixel = i % chunkSize;
+            }
+            return [chunk, pixel];
+        };
+
+        const middle = window.middle = document.getElementsByClassName('middle')[0];
+        const state = {
+            isDown: false,
+            x: 0,
+            y: 0,
+            dx: 0, 
+            dy: 0,
+        };
+
+        const transformPosition = {
+            x: 0,
+            y: 0,
+        };
+
+        const down = function(event) {
+            state.isDown = true;
+            state.x = event.clientX;
+            state.y = event.clientY;
+        }
+
+        const move = function(event) {
+            state.dx = event.clientX - state.x;
+            state.dy = event.clientY - state.y;
+            state.x = event.clientX;
+            state.y = event.clientY;
+            
+            middle.innerHTML = `${event.clientX}, ${event.clientY}`;
+
+            if (state.isDown) {
+                transformPosition.x += state.dx;
+                transformPosition.y += state.dy;
+
+                // const [a, x] = split(transformPosition.x);
+                // const [b, y] = split(transformPosition.y);
+                const x = transformPosition.x;
+                const y = transformPosition.y;
+
+
+                console.log('moveto:', x, y);
+
+                middle.style.transform = `translate3d(${x}px,${y}px,0)`;
+            }
+        }
+
+        const up = function(event) {
+            state.isDown = false;
+        }
+
+        document.addEventListener('scroll', (event) => {
+            console.log('document.scroll', event);
+        });
+
+        middle.addEventListener('scroll', (event) => {
+            console.log('middle.scroll', event);
+        });
+
+        middle.addEventListener('wheel', (event) => {
+            console.log('middle.wheel', event);
+        });
+
+        middle.addEventListener('mousedown', down);
+
+        middle.addEventListener('mousemove', move);
+
+        middle.addEventListener('mouseup', up);
+
+    </script>
+</html>
